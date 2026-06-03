@@ -1,0 +1,1087 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>B787 Systems & Memo Comprehensive Quiz</title>
+<!-- Tailwind CSS CDN -->
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+:root {
+  --quiz-font-size: 14px;
+}
+body {
+  font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, 'Malgun Gothic', sans-serif;
+  background-color: #f4f7fc;
+  color: #1e293b;
+  -webkit-tap-highlight-color: transparent;
+}
+.q-text {
+  font-size: var(--quiz-font-size);
+}
+.opt-text {
+  font-size: calc(var(--quiz-font-size) - 1px);
+}
+.exp-text {
+  font-size: calc(var(--quiz-font-size) - 2px);
+}
+/* 플립 카드 애니메이션 (Flashcard 전용) */
+.flip-card {
+  background-color: transparent;
+  perspective: 1000px;
+}
+.flip-card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-style: preserve-3d;
+}
+.flip-card.flipped .flip-card-inner {
+  transform: rotateY(180deg);
+}
+.flip-card-front, .flip-card-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  border-radius: 1rem;
+}
+.flip-card-back {
+  transform: rotateY(180deg);
+}
+/* 모바일 터치 최적화 스크롤 */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+</style>
+</head>
+<body class="min-h-screen flex flex-col antialiased">
+
+<!-- ── HEADER (파스텔 블루 & 실버 소프트 테마) ── -->
+<header class="bg-white/80 backdrop-blur-md sticky top-0 z-50 px-3 py-3 border-b border-blue-100/60 shadow-sm">
+  <div class="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
+    <div class="flex items-center gap-2.5 w-full sm:w-auto">
+      <span class="text-2xl filter drop-shadow">✈️</span>
+      <div class="leading-tight">
+        <h1 class="font-extrabold text-sm tracking-tight text-blue-600">B787 MEMO SYSTEM</h1>
+        <p class="text-[10px] text-slate-400 font-semibold">B787-9 / B787-10 운항메모 종합 평가</p>
+      </div>
+    </div>
+    <div class="flex items-center justify-between sm:justify-end gap-2 w-full sm:w-auto">
+      <!-- 텍스트 크기 조절기 -->
+      <div class="flex items-center bg-[#f1f5f9] border border-slate-200 rounded-lg p-0.5">
+        <button onclick="changeFontSize(-1)" class="w-6 h-6 flex items-center justify-center text-xs font-bold text-slate-600 hover:bg-white rounded transition shadow-2xs" title="글자 작게">A-</button>
+        <span id="fontLabel" class="text-[10px] font-mono px-2 text-slate-500 font-bold">14px</span>
+        <button onclick="changeFontSize(1)" class="w-6 h-6 flex items-center justify-center text-xs font-bold text-slate-600 hover:bg-white rounded transition shadow-2xs" title="글자 크게">A+</button>
+      </div>
+      <!-- 랜덤 20문제 실행기 -->
+      <button onclick="startRandomQuiz()" class="bg-blue-500 hover:bg-blue-600 active:scale-95 text-white font-extrabold py-1.5 px-3 rounded-lg text-xs transition shadow-sm flex items-center gap-1">
+        🎲 <span>랜덤 20제</span>
+      </button>
+      <!-- 상태 칩 -->
+      <div id="statusChip" class="bg-sky-50 border border-sky-100 text-sky-700 rounded-lg py-1 px-2.5 text-xs flex items-center gap-1">
+        <span class="text-sky-500 font-extrabold">풀이</span>
+        <b id="solvedCount" class="text-blue-600 font-mono font-black">0</b>/<span id="totalCount" class="font-mono text-slate-400">0</span>
+        <button onclick="resetSolves()" class="text-slate-400 hover:text-rose-500 font-bold ml-1 transition" title="기록 초기화">↺</button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ── NAVIGATION TABS (캡슐형 파스텔 탭) ── -->
+<nav class="bg-white/60 backdrop-blur-sm border-b border-slate-100 sticky top-[57px] sm:top-[53px] z-40 shadow-xs">
+  <div class="max-w-4xl mx-auto flex items-center overflow-x-auto no-scrollbar gap-1 px-3 py-1.5">
+    <button onclick="selectCategory('all')" id="tab-all" class="nav-tab px-3 py-1.5 text-xs font-extrabold rounded-full text-slate-500 hover:bg-slate-100 whitespace-nowrap active transition">전체보기</button>
+    <button onclick="selectCategory('lim')" id="tab-lim" class="nav-tab px-3 py-1.5 text-xs font-extrabold rounded-full text-slate-500 hover:bg-slate-100 whitespace-nowrap transition">Limitation</button>
+    <button onclick="selectCategory('norm')" id="tab-norm" class="nav-tab px-3 py-1.5 text-xs font-extrabold rounded-full text-slate-500 hover:bg-slate-100 whitespace-nowrap transition">Normal &amp; OMB</button>
+    <button onclick="selectCategory('weather')" id="tab-weather" class="nav-tab px-3 py-1.5 text-xs font-extrabold rounded-full text-slate-500 hover:bg-slate-100 whitespace-nowrap transition">Weather &amp; Fuel</button>
+    <button onclick="selectCategory('nonnorm')" id="tab-nonnorm" class="nav-tab px-3 py-1.5 text-xs font-extrabold rounded-full text-slate-500 hover:bg-slate-100 whitespace-nowrap transition">Non-Normal</button>
+    <button onclick="selectCategory('sa')" id="tab-sa" class="nav-tab px-3 py-1.5 text-xs font-extrabold rounded-full text-sky-600 hover:bg-sky-50 whitespace-nowrap transition">✍️ 주관식 평가</button>
+    <button onclick="selectCategory('fc')" id="tab-fc" class="nav-tab px-3 py-1.5 text-xs font-extrabold rounded-full text-emerald-600 hover:bg-emerald-50 whitespace-nowrap transition">⚡ Flashcard</button>
+  </div>
+</nav>
+
+<!-- ── MAIN AREA ── -->
+<main class="flex-1 max-w-4xl w-full mx-auto p-3 md:py-6">
+  <!-- 상단 비주얼 스키매틱 데크 (파스텔톤 축소 적용으로 모바일 스크롤 최소화) -->
+  <section class="mb-6 grid grid-cols-1 md:grid-cols-2 gap-3">
+    <!-- 테일 스트라이크 & 고도 마진 다이어그램 -->
+    <div class="bg-white rounded-2xl p-3.5 border border-blue-100/50 shadow-xs flex flex-col justify-between">
+      <div class="flex items-center justify-between mb-1.5">
+        <h3 class="text-xs font-black tracking-tight text-slate-600">PITCH LIMITS &amp; TAIL STRIKE</h3>
+        <span class="text-[9px] bg-rose-50 text-rose-500 px-2 py-0.5 rounded-full font-bold">B787-9 vs B787-10</span>
+      </div>
+      <!-- SVG 기체 모식도 일러스트레이션 -->
+      <div class="h-24 flex items-center justify-center my-1 bg-[#fbfcfd] rounded-xl overflow-hidden relative border border-slate-100">
+        <svg class="w-full h-full max-w-[260px]" viewBox="0 0 300 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- 땅선 -->
+          <line x1="10" y1="95" x2="290" y2="95" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="3 3"/>
+          <!-- 비행기 동체 간략화 라인 (회전축 표시) -->
+          <g transform="translate(130, 80) rotate(-7)">
+            <!-- 기수 가이드 -->
+            <line x1="-100" y1="0" x2="100" y2="0" stroke="#60a5fa" stroke-width="2.5" stroke-linecap="round"/>
+            <circle cx="100" cy="0" r="3.5" fill="#3b82f6"/>
+            <!-- 꼬리날개 -->
+            <line x1="-90" y1="0" x2="-100" y2="-22" stroke="#60a5fa" stroke-width="2.5"/>
+            <!-- 날개 위치 고정 -->
+            <ellipse cx="0" cy="0" rx="12" ry="4" fill="#2563eb"/>
+          </g>
+          <!-- 회전점 바퀴 -->
+          <circle cx="130" cy="90" r="4.5" fill="#ffffff" stroke="#94a3b8" stroke-width="1.5"/>
+          <circle cx="142" cy="90" r="4.5" fill="#ffffff" stroke="#94a3b8" stroke-width="1.5"/>
+          <!-- 각도 가이드라인 -->
+          <path d="M130,90 L260,90 M130,90 L250,55" stroke="#f43f5e" stroke-width="1.2" stroke-linecap="round"/>
+          <text x="220" y="85" fill="#f43f5e" class="text-[9px] font-bold">B787-9: 7.8° (9.7°)</text>
+          <text x="190" y="45" fill="#475569" class="text-[9px] font-bold">B787-10: 6.8°</text>
+        </svg>
+        <span class="absolute bottom-1.5 left-2 text-[8px] text-slate-400">※ 이착륙 피치 마진 : 단 2.2°</span>
+      </div>
+      <p class="text-[10px] text-slate-400 mt-1 leading-normal">Liftoff 지시 신호 부재 시 PM은 즉시 <b class="text-rose-400">“PITCH, PITCH”</b> 콜아웃을, PF는 해당 피치를 유지해야 합니다.</p>
+    </div>
+
+    <!-- 180도 선회 포장 폭 다이어그램 -->
+    <div class="bg-white rounded-2xl p-3.5 border border-emerald-100/50 shadow-xs flex flex-col justify-between">
+      <div class="flex items-center justify-between mb-1.5">
+        <h3 class="text-xs font-black tracking-tight text-slate-600 uppercase">180° Turn Pavement Width</h3>
+        <span class="text-[9px] bg-emerald-50 text-emerald-600 px-2 py-0.5 rounded-full font-bold">FCTM 2.10</span>
+      </div>
+      <div class="h-24 flex items-center justify-center my-1 bg-[#fbfcfd] rounded-xl overflow-hidden relative border border-slate-100">
+        <svg class="w-full h-full max-w-[260px]" viewBox="0 0 300 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- 선회 외벽 원 가이드 -->
+          <circle cx="150" cy="60" r="45" stroke="#e2e8f0" stroke-width="1" stroke-dasharray="2 2"/>
+          <circle cx="150" cy="60" r="32" stroke="#cbd5e1" stroke-width="1.5"/>
+          <!-- 비행기 머리반경/꼬리반경 가이드 화살표 -->
+          <line x1="150" y1="60" x2="190" y2="38" stroke="#3b82f6" stroke-width="1.5" stroke-linecap="round"/>
+          <text x="175" y="55" fill="#3b82f6" class="text-[8px] font-bold">Tail R</text>
+          <line x1="150" y1="60" x2="115" y2="85" stroke="#10b981" stroke-width="1.5" stroke-linecap="round"/>
+          <text x="102" y="73" fill="#10b981" class="text-[8px] font-bold">Nose R</text>
+          <!-- 중심점 피벗 기어 -->
+          <rect x="148" y="53" width="3" height="14" rx="1" fill="#64748b"/>
+        </svg>
+        <span class="absolute bottom-1.5 left-2 text-[8px] text-slate-400">※ 창 하단 모서리 = 메인 기어 선착 기준</span>
+      </div>
+      <div class="text-[10px] text-slate-500 mt-1 space-y-0.5">
+        <div>• <b>B787-9 선회 반경 폭:</b> <span class="text-blue-500 font-bold">154 ft (47.0 m)</span></div>
+        <div>• <b>B787-10 선회 반경 폭:</b> <span class="text-emerald-500 font-bold">176 ft 7 in (53.8 m)</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 메인 질문 영역 로더 -->
+  <div id="quizContainer" class="space-y-4"></div>
+</main>
+
+<!-- ── FOOTER ── -->
+<footer class="bg-slate-950 text-slate-500 py-6 border-t border-slate-900 mt-auto text-center px-4 text-xs">
+  <div class="max-w-4xl mx-auto space-y-1">
+    <p class="font-semibold text-slate-400">B787 Type Rating Memo Study Deck</p>
+    <p class="text-[10px] text-slate-600">기내표준 신호, 소방 등급, 3% Contingency Fuel, Overweight Landing, Airspeed Unreliable 및 Cold/Hot WX 전 범위 수록</p>
+    <p class="text-[9px] text-slate-700 pt-2">&copy; 2026. B787 Systems Quiz App inside Canvas. All rights reserved.</p>
+  </div>
+</footer>
+
+<script>
+// ── SYSTEM QUIZ DATA ──
+const SYSTEM_QUIZ_DATA = {
+  "sa": [], // JS Dynamic Map
+  "lim": [
+    {
+      q: "All Call 운항 중 운항 승무원과 객실 승무원 간의 '기내 표준 비상 신호'로 규정된 조합으로 올바른 것은 무엇입니까? (S.2.2.2)",
+      opts: [
+        "운항에서 객실: “5, 5” / 객실에서 운항: “*, *”",
+        "운항에서 객실: “*, *” / 객실에서 운항: “5, 5”",
+        "운항에서 객실: “9, 9” / 객실에서 운항: “#, #”",
+        "운항에서 객실: “2, 2” / 객실에서 운항: “0, 0”"
+      ],
+      ans: 0,
+      exp: "운항 승무원에서 객실 승무원으로 전송하는 비상 호출 표준은 “5, 5” 이며, 반대로 객실에서 운항으로 전달하는 신호는 “*, *” 입니다."
+    },
+    {
+      q: "당사 규정(FOM 5.13.2) 기준, B787 항공기의 '구조 및 소방 등급' 분류로 옳은 것은 무엇입니까?",
+      opts: [
+        "ICAO 8 등급 / FAA D 등급",
+        "ICAO 9 등급 / FAA E 등급",
+        "ICAO 10 등급 / FAA E 등급",
+        "ICAO 7 등급 / FAA C 등급"
+      ],
+      ans: 1,
+      exp: "B787은 A350, A330-300, B777, B747-400 기종과 함께 ICAO 9 등급 및 FAA E 등급에 해당합니다."
+    },
+    {
+      q: "ICAO Aerodrome Reference Code 및 Wingspan에 따른 등급 분류(Note) 지침 중 괄호와 볼드로 표기된 올바른 규정은 무엇입니까?",
+      opts: [
+        "Wingspan과 Outer Main Gear Wheel Span 등급이 다를 경우, 낮은 등급을 적용한다.",
+        "Wingspan과 Outer Main Gear Wheel Span 등급이 다를 경우, 높은 등급을 적용한다.",
+        "기수바퀴(Nose Gear) 거리에 기초하여 항상 ICAO 4E 고정 등급을 부여한다.",
+        "FAA Airplane Design Group (ADG)에 따르며 Wingspan 등급만 단독 고려한다."
+      ],
+      ans: 1,
+      exp: "Note에 명시된 대로, Wingspan과 Outer Main Gear Wheel Span 등급이 상이할 경우 '높은 등급(E)'을 보수적으로 적용합니다."
+    },
+    {
+      q: "기체 180도 선회(Turns of 180 Degrees)를 위한 '최소 포장 도로 폭(Min pavement width)' 한계 수치로 올바른 것은 무엇입니까?",
+      opts: [
+        "B787-9 : 140 ft (42.7m) / B787-10 : 165 ft (50.3m)",
+        "B787-9 : 154 ft (47.0 m) / B787-10 : 176 ft 7 inches (53.8 m)",
+        "B787-9 : 165 ft (50.3m) / B787-10 : 197 ft 3 inches (60.1m)",
+        "B787-9 : 154 ft (47.0 m) / B787-10 : 154 ft (47.0 m)"
+      ],
+      ans: 1,
+      exp: "B787-9의 최소 도로 폭은 154 ft (47.0 m)이며, B787-10의 최소 도로 폭은 176 ft 7 inches (53.8 m) 입니다."
+    },
+    {
+      q: "B787-9 및 B787-10의 최대 기압 고도 운영 한계(Maximum Operating Altitude)로 각각 올바른 것은 무엇입니까?",
+      opts: [
+        "B787-9 : 43,100 ft / B787-10 : 41,100 ft",
+        "B787-9 : 41,100 ft / B787-10 : 43,100 ft",
+        "B787-9 : 45,100 ft / B787-10 : 43,100 ft",
+        "B787-9 : 43,000 ft / B787-10 : 41,000 ft"
+      ],
+      ans: 0,
+      exp: "B787-9의 한계는 43,100 ft pressure altitude 이고, B787-10의 한계는 41,100 ft pressure altitude 입니다."
+    },
+    {
+      q: "자동 비행 최저 연결 고도(minimum engage altitude) 및 비계기/시계 접근 시의 오토파일럿 해제 기준 수치는 각각 어떻게 됩니까?",
+      opts: [
+        "이륙 후 400 ft AGL 이상 연결 / 접근 시 1,000 ft HAA/HAT 이전 해제",
+        "이륙 후 200 ft AGL 이상 연결 / 접근 시 500 ft HAA/HAT 이전 해제",
+        "이륙 후 100 ft AGL 이상 연결 / 접근 시 200 ft HAA/HAT 이전 해제",
+        "이륙 후 200 ft AGL 이상 연결 / 접근 시 100 ft HAA/HAT 이전 해제"
+      ],
+      ans: 1,
+      exp: "이륙 후 최소 자동 조종 연결 고도는 200 ft AGL 이며, Circling/Visual approach 시 오토파일럿 해제 한계는 500 ft HAA/HAT 이전입니다."
+    },
+    {
+      q: "LAND 2 또는 LAND 3 자동 착륙 표시등(Annunciation)이 없는 상태에서 접근 비행 시, Autopilot 해제 수치는 기종별로 각각 어떻게 정의됩니까?",
+      opts: [
+        "B787-9 : 100 ft AGL / B787-10 : 135 ft AGL",
+        "B787-9 : 135 ft AGL / B787-10 : 100 ft AGL",
+        "B787-9 : 135 ft AGL / B787-10 : 135 ft AGL",
+        "B787-9 : 200 ft AGL / B787-10 : 100 ft AGL"
+      ],
+      ans: 1,
+      exp: "LAND 2/3 표시가 없는 경우 Autopilot 해제 고도는 B787-9의 경우 135 ft AGL 이며, B787-10의 경우 100 ft AGL 입니다."
+    },
+    {
+      q: "심한 난기류 조우 시 B787 시스템 매뉴얼에 명시된 '난기류 관통 속도(Turbulent air penetration speed)' 기준 수치로 올바른 것은 무엇입니까?",
+      opts: [
+        "25,000 ft 미만: 290 KIAS / 25,000 ft 이상: 310 KIAS 또는 .84 Mach 중 높은 값",
+        "25,000 ft 미만: 290 KIAS / 25,000 ft 이상: 310 KIAS 또는 .84 Mach 중 낮은 값",
+        "25,000 ft 미만: 270 KIAS / 25,000 ft 이상: 290 KIAS 또는 .82 Mach 중 낮은 값",
+        "고도 상관없이 공통 속도로 310 KIAS 또는 .84 Mach 고정 적용"
+      ],
+      ans: 1,
+      exp: "관통 속도는 25,000 ft 미만에서 290 KIAS 이고, 25,000 ft 이상 영역에서는 310 KIAS 또는 .84 Mach 중 낮은 값(whichever is lower) 입니다."
+    }
+  ],
+  "norm": [
+    {
+      q: "ANOMALOUS TAT PROBE LOGIC (운항 뷸레틴 KAL-6R1)에 의해 공중에서 Anti-ice 시스템을 수동 작동(Manual Operation)해야 하는 기온 조건과 그 하강 연기(Delay) 고도 기준으로 올바른 것은 무엇입니까?",
+      opts: [
+        "TAT가 10°C 이하이면서 육안 수분이 있을 때 가동 / 필요 시 1,000 ft AGL까지 연기 가능",
+        "TAT가 15°C 이하 10°C 초과이고 육안 수분이 있을 때 가동 / 필요 시 1,500~2,500 ft AGL까지 가동 연기 가능",
+        "TAT가 25°C 이하이면서 결빙이 감지되었을 때만 가동 / 필요 시 3,000 ft AGL까지 연기 가능",
+        "OAT가 10°C 이하이면서 눈이나 슬러시가 감지될 때 즉시 가동 / 연기 불가"
+      ],
+      ans: 1,
+      exp: "Anomalous TAT probe logic 상 TAT가 15°C 이하이고 10°C 초과인 영역에서도 육안 수분이 존재하면 Anti-ice가 켜져야 하며, 이륙 성능 충족을 위해 이 작동을 1,500 ft AGL까지, 늦어도 2,500 ft AGL까지는 연기할 수 있습니다."
+    },
+    {
+      q: "VMC 저고도 접근 중 통합 접근 항법(IAN)의 오경보로 인해 'GLIDESLOPE' 음성 경고가 울릴 경우, 경고음을 끄기(Silence) 위한 유일하게 가용한 조치 스위치는 무엇입니까? (KAL-43R1)",
+      opts: [
+        "주 조종석 정면의 오디오 컨트롤 패널(ACP) 'AURAL CANCEL' 스위치 조작",
+        "오버헤드 중앙 패널 트랜스폰더 좌측에 장착된 'BELOW G/S (G/S INHIBIT)' 스위치 조작",
+        "글래스 콕핏 하부의 'FMC RUNWAY DISAGREE' 전원 차단 스위치 조작",
+        "오토파일럿 끊기(Disconnect) 스위치를 연속으로 2회 푸시"
+      ],
+      ans: 1,
+      exp: "KAL-43R1에 명시된 바와 같이, 글라이드슬롭 음성 경고를 끄려면 'Aural Cancel' 버튼이 아닌 'G/S INHIBIT (BELOW G/S)' 스위치를 눌러야 정상 차단됩니다."
+    },
+    {
+      q: "이륙 중 비정상 메시지 경보 방지를 위한 이륙 플랩 세팅(NADP2) 시 'THR REDUCTION(Thrust Reduction Point)' 고도값 설정 기준 수치는 어떻게 됩니까? (KAL-44)",
+      opts: [
+        "이륙 플랩 설정이 FLAPS 5보다 큰(greater) 경우, 고도를 1,500 ft로 세팅한다.",
+        "이륙 플랩 설정이 FLAPS 15 이하인 경우, 고도를 1,000 ft로 세팅한다.",
+        "이륙 플랩 설정이 FLAPS 5보다 작은 경우, 고도를 3,000 ft로 세팅한다.",
+        "이륙 플랩과 무관하게 항상 고정값인 3,000 ft로 통일한다."
+      ],
+      ans: 0,
+      exp: "Climb thrust 조기 차단 오류를 예방하기 위해, takeoff flap 설정이 FLAPS 5보다 큰 경우 THR REDUCTION 포인트를 1,500 ft로 세팅해야 합니다."
+    },
+    {
+      q: "이륙 택시 라인업(LINE-UP) 진행 중 원치 않는 'FMC RWY DISAGREE' 메시지 오작동을 예방하기 위해 조종사가 초과하지 말아야 하는 최대 N1 추력 수치(maximum thrust)는 얼마입니까?",
+      opts: [
+        "40% N1",
+        "45% N1",
+        "58% N1",
+        "60% N1"
+      ],
+      ans: 2,
+      exp: "FMC RWY DISAGREE 메시지가 불필요하게 트리거되는 것을 방지하기 위해, 이륙 라인업 중 엔진 테스트나 가속 시 58% N1을 초과하지 않도록 권장됩니다."
+    },
+    {
+      q: "B787의 에어 시스템(Air Conditioning System) 기능 중 지상에서 Cabin Occupant 수치를 설정할 때, CAC Surge 예방을 위한 기종별 표준 인원 설정값(Cabin occupants)은 각각 몇 명입니까?",
+      opts: [
+        "B787-8/-9 : 250명 / B787-10 : 300명",
+        "B787-8/-9 : 318명 / B787-10 : 337명",
+        "B787-8/-9 : 337명 / B787-10 : 318명",
+        "기종 공통으로 최대 승객 한계인 350명으로 설정"
+      ],
+      ans: 1,
+      exp: "에어컨 불충분 기류로 인한 CAC 서지 방지를 위해, Cabin Occupants 세팅값을 B787-8/-9의 경우 318명, B787-10의 경우 337명으로 세팅하도록 절차화되어 있습니다."
+    },
+    {
+      q: "정전 및 조업 이동 시 사용하는 'Towing Power mode' 상태일 때 전원이 공급되지 않는(not energized) 시스템은 무엇입니까?",
+      opts: [
+        "조종실 보조 항법 시스템 (Flight Instruments)",
+        "무선 통신 시스템 (Radio communication systems)",
+        "브레이크 압력 시스템 (Brake Pressurization)",
+        "주 기내 조명 시스템 (Dome/Cabin Lights)"
+      ],
+      ans: 1,
+      exp: "Towing Power 모드에서는 Radio communication system(무선 통신 시스템)에 전원이 들어오지 않으므로 교신이 불가능합니다."
+    },
+    {
+      q: "B787-9 및 B787-10의 비상시 조종사 가용 산소 압력(Flight Crew Oxygen) 제한 수치로 각각 올바른 것은 무엇입니까?",
+      opts: [
+        "B787-9 : 800 psi / B787-10 : 800 psi",
+        "B787-9 : 862 psi / B787-10 : 844 psi",
+        "B787-9 : 844 psi / B787-10 : 862 psi",
+        "B787-9 : 1,000 psi / B787-10 : 1,000 psi"
+      ],
+      ans: 1,
+      exp: "수치 한계 기준에 의거하여, 최저 산소 압력 기준은 B787-9의 경우 862 psi 이며, B787-10의 경우 844 psi 입니다."
+    }
+  ],
+  "weather": [
+    {
+      q: "Live Animal과 동일 화물실(Compartment)에 절대 혼합 탑재해서는 안 되는 특수 화물이자 추천 최대 중량 제한(Max Dry Ice Load)을 받는 위험물 코드는 무엇입니까?",
+      opts: [
+        "Dry Ice (Code PER(perishable))",
+        "Lithium Batteries (Code RLI/RLM)",
+        "Clinial Specimens (Code UN3373)",
+        "Consumer Commodity (Code ID8000)"
+      ],
+      ans: 0,
+      exp: "Dry Ice(코드 PER, 드라이아이스)는 이산화탄소 방출로 인해 살아있는 동물(Live Animal)과 동일 Compartment 탑재가 엄격히 제한됩니다."
+    },
+    {
+      q: "비행 중 또는 지상에서 연료 밸런스 자동 제어(Fuel Balance System)가 불가능하도록 시스템 억제(Inhibited) 처리되는 조건이 아닌 것은 무엇입니까?",
+      opts: [
+        "지상에서 어느 한 엔진이라도 시동되어 가동 중인 경우 (on the ground and one or both engines are running)",
+        "중앙 연료 탱크 펌프가 켜져 있는 경우 (a center tank pump is on)",
+        "목적지 상공에서 고도 강하를 개시하여 DESCENT 모드가 활성화된 경우",
+        "연료 방출 시스템이 활성화되었거나 FUEL DISAGREE 메시지가 표시된 경우"
+      ],
+      ans: 2,
+      exp: "단순히 Descent 모드로 진입한 것은 연료 밸런스 억제 조건이 아닙니다. 지상 엔진 가동, Center tank 펌프 ON, Jettison 시스템 활성화, FUEL DISAGREE, FUEL QTY LOW 상태 등에서 밸런싱이 강제 차단됩니다."
+    },
+    {
+      q: "영하 기온 상태에서 지상 조업 시 안티아이스 시스템 지상 작동 억제 로직과 관련하여, 자동 결빙 감지(Automatic ice detection)와 윙 방빙(Wing anti-ice)이 차단(Inhibited)되는 지상 속도는 얼마입니까?",
+      opts: [
+        "50 knots 미만",
+        "75 knots 미만",
+        "80 knots 미만",
+        "100 knots 미만"
+      ],
+      ans: 1,
+      exp: "지상에서는 75 knots 미만일 때 자동 결빙 감지 및 윙 방빙 기능의 작동이 억제(Inhibited)됩니다."
+    },
+    {
+      q: "지상 OAT 3°C 이하의 결빙 조건(Icing Condition)에서 착륙 후 지상 택시(Taxi-in) 중, 제방빙 run-up 점검을 수행하지 못하고 램프인(Ramp-in) 했을 때 정비 일지(Flight Maintenance Log) 기록 규정은 무엇입니까?",
+      opts: [
+        "조치 불필요, 단순 이월 처리한다.",
+        "“Taxiing in icing condition for 00 min”으로 Logging을 실시한다.",
+        "“Flaps and slats operated in icing conditions”로 단순 Logging만 한다.",
+        "정비사 구두 통보로 대체하고 일지 기록은 생략한다."
+      ],
+      ans: 1,
+      exp: "Landing 후 3°C 이하 Icing 상태에서 지상 엔진 런업 점검 없이 기수를 파킹한 경우, 누적 방빙 노출 상태 정비를 위해 “Taxiing in icing condition for 00 min” 기록을 명시해야 합니다."
+    },
+    {
+      q: "외기 온도 극저온(at or below -17°C) 상황 하에서 지상 정차 시, 전기 유압 펌프 선택기(selectors)가 AUTO 또는 OFF 위치로 몇 분 이상 지속될 때 정비사 통보 조치가 필요한가요?",
+      opts: [
+        "5분 이상",
+        "10분 이상",
+        "15분 이상",
+        "20분 이상"
+      ],
+      ans: 1,
+      exp: "-17°C 이하 극저온에서 전기식 유압 펌프가 가동되지 않고 10분 이상 방치된 상태에서 엔진 구동 펌프를 켜면 cavitation 등에 의한 시스템 손상 위험이 있어 정비사에 즉시 알려야 합니다."
+    }
+  ],
+  "nonnorm": [
+    {
+      q: "조종사가 비행 중 급격한 아날로그/디지털 계기 오작동을 인지하고 'AIRSPEED UNRELIABLE' 메모리 아이템(Memory Item)을 선언했습니다. 초기 항공기 통제력 확보를 위해 기어 수납(Gear up) 상태에서 즉각 고정 세팅해야 하는 플랩 상태별 피치 각도(Pitch Attitude)와 추력(Thrust) 조합으로 올바른 것은 무엇입니까?",
+      opts: [
+        "Flaps Extended 상태: 10° 및 85% N1 / Flaps Up 상태: 4° 및 70% N1",
+        "Flaps Extended 상태: 15° 및 90% N1 / Flaps Up 상태: 5° 및 75% N1",
+        "Flaps Extended 상태: 5° 및 60% N1 / Flaps Up 상태: 2° 및 Flight Idle",
+        "Flaps Extended 상태: 10° 및 80% N1 / Flaps Up 상태: 4° 및 65% N1"
+      ],
+      ans: 0,
+      exp: "속도계 신뢰 불가 비상 상황 시, 플랩 연장 상태에서는 10° 피치 및 85% N1 추력을 세팅하고, 플랩 수납(Clean) 상태에서는 4° 피치 및 70% N1 추력을 고정 인가해야 안전 여유 고도가 확보됩니다."
+    },
+    {
+      q: "FAA 권고 및 보잉 개정 절차에 따라, 지상(On the Ground)에서 EICAS 경보 메시지와 함께 'FIRE ENG L, R' 상황이 발생했을 때 올바른 비상 처리 요령은 무엇입니까?",
+      opts: [
+        "비행 중과 동일하게 Fuel Control Switch Cutoff 등 Memory Item을 즉시 암기 수행한다.",
+        "Memory Item을 수행하지 않고, 즉시 '[ ] FIRE ENG L, R' 전자기 체크리스트(ECL)를 직접 수행한다.",
+        "소방대가 도착할 때까지 엔진 시동을 유지하고 소화병 방출을 보류한다.",
+        "오토파일럿 디스커넥트 스위치를 연속으로 3회 누른다."
+      ],
+      ans: 1,
+      exp: "최신 지상 엔진 화재 지침에 따라, 지상에서는 즉각적인 상황 인지 하에 암기 과제(Memory Item) 없이 곧바로 '[ ] FIRE ENG L, R' 전자기 체크리스트(ECL)를 전 단계 Read & Do로 직접 수행합니다."
+    },
+    {
+      q: "이륙 중 지상속도 85 knots 초과 영역에서 이륙 거부(RTO)를 개시했을 때, Autobrake 시스템이 최대 제동 압력을 자동으로 인가(Apply)하기 위한 조종사의 필수 조작 조건은 무엇입니까?",
+      opts: [
+        "RTO Autobrake 다이얼 선택 여부와 무관하게 양쪽 스로틀 레버를 idle 영역으로 수동 복귀시킨다.",
+        "오토 브레이크 다이얼이 RTO 상태이고, 양쪽 Thrust lever가 수동으로 idle 범위로 복귀되어야 한다.",
+        "역추력 레버(Reverser)가 반드시 Maximum Reverse 상태로 끝까지 인가되어야 한다.",
+        "오토 브레이크 작동을 위해 페달 브레이크를 조종사가 물리적으로 직접 끝까지 밟아야 한다."
+      ],
+      ans: 1,
+      exp: "RTO 자동 제동은 오토 브레이크 선택기가 RTO 위치에 있고, 지상속도가 85노트를 초과한 상태에서 조종사가 양쪽 스로틀(Thrust Lever)을 Idle 위치로 당길 때 비로소 최대 제동이 작동됩니다."
+    },
+    {
+      q: "비행 중 양쪽 엔진이 모두 고장나거나 스톨 상태에 빠진 'Dual Eng Fail/Stall' 심각 비상 조우 시, 조종사가 즉각 암기 수행해야 하는 메모리 항목의 올바른 조치 순서는 무엇입니까?",
+      opts: [
+        "A/T ARM 스위치 OFF → F/D OFF → 자세 4도 고정",
+        "FUEL CONTROL 스위치 양쪽 모두 CUTOFF 후 RUN → RAT 스위치 1초간 누름 → 속도 270 knots 이상 유지",
+        "APU 시동 개시 → 오토 브레이크 RTO 세팅 → 기어 다운",
+        "화재 스위치 풀(Pull) → 연료 밸브 폐쇄 → 수동 강하"
+      ],
+      ans: 1,
+      exp: "Dual Eng Fail/Stall의 메모리 아이템은 1) FUEL CONTROL 스위치 양쪽 CUTOFF 후 RUN, 2) RAM AIR TURBINE 스위치를 1초간 길게 눌러 전기/유압 비상 전원 공급, 3) 윈드밀 스타트 기류를 위해 속도를 270 knots 이상으로 유지하는 것입니다."
+    },
+    {
+      q: "Yellow Sealing(USED & SERVICEABLE 스티커 포함) 처리가 되어 있는 EMK(Emergency Medical Kit) 비상 의료 키트의 당사 기지 교체 탑재 기준은 무엇입니까?",
+      opts: [
+        "목적지 해외 공항에서 무조건 우선 교체한다.",
+        "모기지(김포 및 인천공항)에서는 반드시 새로운 EMK로 교체 탑재하여야 한다.",
+        "봉인이 살아있다면 정비 주기가 도달하기 전까지 계속 사용 가능하다.",
+        "의무 요원(의사)의 탑승 여부가 확인될 때만 교체를 요청한다."
+      ],
+      ans: 1,
+      exp: "Yellow Sealing 처리되었거나 사용 완료된 EMK는 항공기 정비를 통제하는 모기지인 김포 및 인천공항 기지에서 무조건 새 제품으로 교체 탑재해야 합니다."
+    }
+  ]
+};
+
+const FLASHCARD_DATA = [
+  // ── 오리지널 중요 데이터 카드 ──
+  { q: "Dual Eng Fail/Stall", ans: "• FUEL CONTROL 스위치 (both): CUTOFF, then RUN\n• RAM AIR TURBINE 스위치: Push and hold for 1 second\n• 기동 기류(Windmill) 유지를 위해 속도를 270 knots 이상 유지" },
+  { q: "AIRSPEED UNRELIABLE", ans: "• Autopilot disconnect 스위치: Push\n• A/T ARM 스위치 (both): OFF\n• F/D 스위치 (both): OFF\n• 고정 기수 자세 및 추력 세팅:\n  - Flaps extended: 10° 및 85% N1\n  - Flaps up: 4° 및 70% N1" },
+  { q: "STABILIZER CUTOUT (STAB Runaway)", ans: "• STAB cutout 스위치 (both): CUTOFF\n• 기동 한계 준수를 위해 현재 속도(current airspeed)를 절대 초과하지 않도록 통제" },
+  { q: "CABIN ALTITUDE EXCESSIVE", ans: "• 산소 마스크 착용 및 산소 100% 공급\n• 승무원 간의 통신 수립 (Establish communications)\n• 조종석 PASS OXYGEN 스위치: Push to ON\n• 10,000 ft 또는 최저 안전고도(Grid MORA) 중 높은 쪽으로 비상 강하 개시" },
+  { q: "ENG SVR DAMAGE / SEPARATION", ans: "• A/T ARM 스위치: OFF\n• Thrust Lever: Retard to IDLE (or confirm & retard)\n• FUEL CONTROL 스위치: CUTOFF\n• Engine Fire Switch: PULL" },
+  { q: "지상 FIRE ENGINE L, R 발생 시", ans: "• 개정 절차에 따라 Memory Item(암기 조치)을 절대 지상에서 선 수행하지 않음\n• 전자기식 체크리스트(ECL)의 'Ground' 항목을 순서대로 Read & Do로 직접 기동 수행" },
+  { q: "TCAS Climb RA in Landing Config", ans: "• Autopilot 및 Autothrottle 연결 끊기 (Disconnect)\n• 수동으로 Throttle 완전 전진하여 가용 추력 확보\n• 'FLAPS 20' 지시 및 피치 수동 제어 (TO/GA 스위치 누르지 말 것)\n• GEAR UP 수납 조치" },
+  { q: "LAND AT NEAREST SUITABLE AIRPORT 강제 조건", ans: "• 비정상 체크리스트 상에 해당 문구가 직접 포함된 경우\n• 기내 화재 또는 연기(Smoke)가 통제되지 않고 지속되는 경우\n• AC 전력 공급원이 단 2개만 남은 경우 (예: 양 발전기 트립)\n• 기타 안전 운항에 중대한 위험이 초과된 모든 비상 상황" },
+
+  // ── [신규 추가] 문서 속 괄호 ( ) 가림 평가용 플래시카드 ──
+  { q: "S.2.2.2 기내표준 신호( ❓ ) : All Call 운항에서 객실 : “5, 5” / 객실에서 운항 : “*, *” 에서 괄호 안에 들어갈 운항 상태 단어는?", ans: "정답: 비상시\n\n(비상시 운항 승무원과 객실 승무원 간의 안전 교신 지표 규정입니다.)" },
+  { q: "S5.5 구조 및 소방등급 [FOM 5.13.2] ( ❓ ) 에서 해당 등급 기준의 대상 항공 기종명은?", ans: "정답: B787\n\n(해당 규정의 ICAO 9등급 및 FAA E등급 지표 적용 기종입니다.)" },
+  { q: "Note: ( ❓ ) 과 Outer Main Gear Wheel Span 등급이 다를 경우, 높은 등급을 적용한다. 에서 가려진 단어는?", ans: "정답: Wingspan\n\n(항공기 크기 Letter 등급 적용 시 Wingspan을 우선 보수적으로 비교 적용합니다.)" },
+  { q: "B787-9 [ ❓ ] 거리 : 25.8m 에서 대괄호 안에 들어갈 기어 축 거리 기준명은?", ans: "정답: Nose Gear - Main Gear\n\n(B787-9 기종의 앞바퀴축에서 주바퀴축까지의 거리 정보입니다.)" },
+  { q: "Engine Oil System : -40 °C • limit thrust to a setting normally used for taxi ( ❓ ) 에서 가려진 N1 추력 제한값은?", ans: "정답: 45% N1\n\n(극 저온 지상 시동 후 유동성 확보를 위해 택시 중 제한해야 하는 목표 추력입니다.)" },
+  { q: "Tailwind( ❓ ) and Crosswind(+ 40 kts) : limit thrust 45% N1 에서 가려진 배풍 제한 상세 조건은?", ans: "정답: 35 kts + Tailwind 5 kts\n\n(Oat -40도 시 역한 기류 방지를 위한 배풍 제어 성분 치수입니다.)" },
+  { q: "B787-9 테일 스트라이크 한계 피치각: 7.8° ( ❓ ) 에서 가려진 가변 최대 한계 피치각 조건은?", ans: "정답: 지상 청소각 고려 시 최대 9.7°\n\n(기체 하부 지상 클리어런스 청소 효과 반영 시의 절대 최대 피치 각도입니다.)" },
+  { q: "RECOMMENDED MAX. DRY ICE LOAD( ❓ ) 에서 가려진 당사 매뉴얼 조항 코드는?", ans: "정답: refer to FOM 13.2\n\n(드라이아이스 기내 승인 한계와 탑재 금지 구역을 지시하는 규정 번호입니다.)" },
+  { q: "Dry Ice Sublimation Rate 1%가 적용되는 포장 박스 무게 기준: 100 lbs( ❓ ) 에서 가려진 kg 단위 수치는?", ans: "정답: 45kg\n\n(100 lbs에 상응하는 킬로그램 단위 기준 무게입니다.)" },
+  { q: "Dry Ice (Code ❓ ) 로 분류되는 보잉 위험물 특수 코드명은?", ans: "정답: PER(perishable)\n\n(드라이아이스와 Live Animal 동일실 격리를 유도하는 위험 물질 분류 표기입니다.)" },
+  { q: "B787-9 180도 선회 포장 도로 폭 한계 수치: ( ❓ ) 154 ft 에서 가려진 미터법 수치는?", ans: "정답: 47.0 m\n\n(B787-9 기종의 도로 선착 반경 최소 한계 미터 수치입니다.)" },
+  { q: "B787-10 180도 선회 포장 도로 폭 한계 수치: ( ❓ ) 176 ft 7 inches 에서 가려진 미터법 수치는?", ans: "정답: 53.8 m\n\n(동체 연장형 B787-10 기종의 최소 도로 선회 폭 미터 단위 기준입니다.)" },
+  { q: "Turns of 180 Degrees ( ❓ ) 에서 가려진 보잉 비행교범 규정 장은?", ans: "정답: FCTM 2.10\n\n(선회 시 조종사 창문 하단 모서리를 기어 외측으로 삼는 지침이 명시된 장입니다.)" },
+  { q: "Wind Limitations ( ❓ ) 에서 가려진 바람 성분 2가지 방향명은?", ans: "정답: Cross/Tail\n\n(RCR 활주로 노면 제동력 상태에 따라 제어 한계를 평가하는 바람 조건입니다.)" },
+  { q: "Low Visibility HUD Takeoff ( ❓ ) 에서 가려진 풍속 단위 표기는?", ans: "정답: kts\n\n(정풍 25kts, 측풍/배풍 10kts의 HUD 시각 유도 한계 단위입니다.)" },
+  { q: "In VNAV, if an AUTOPILOT mode fail nuisance trip ( ❓ ) occurs... 에서 가려진 계기 오류 상태 표시는?", ans: "정답: line through\n\n(오토파일럿 모드 결함 시 PFD 해당 지시 문자 위에 그어지는 무효 선 표시입니다.)" },
+  { q: "Unwanted 'GLIDESLOPE' Advisory During Approaches On Airplanes ( ❓ ) 에서 가려진 접근 옵션 장치명은?", ans: "정답: KAL-43R1\n\n(통합 접근 항법 IAN 옵션 장착 기종의 불필요 오경보 대응용 뷸레틴 번호입니다.)" },
+  { q: "LNAV PATH DEVIATION ( ❓ ) 에서 가려진 선회 각도 합산에 관한 가이드라인은?", ans: "정답: total for all connected turns\n\n(SID 절차 상 가속 제한을 방지하기 위해 연속된 모든 선회각의 합을 의미합니다.)" },
+  { q: "PACK MESSAGES AFTER ENGINE START( ❓ ) 에서 가려진 보잉 정상 절차 장은?", ans: "정답: POM 9.1.17\n\n(시동 후 Y201 소프트웨어 팩 메시지 지연 및 사라짐 특성이 기록된 장입니다.)" },
+  { q: "Expired data has a six-day grace period( ❓ ) 에서 가려진 한글 단어는?", ans: "정답: 유예 기간\n\n(FMS 단말기 데이터 만료 후 정비 업데이트 전까지 비행이 보장되는 법적 기간입니다.)" },
+  { q: "Towing Power mode ( ❓ ) 에서 가려진 조업 시 전원 차단 상세 상태명은?", ans: "정답: not energized\n\n(Towing 모드 하에서 조종실 내 무전기 등에 전류가 차단되는 물리적 상태입니다.)" },
+  { q: "Return to Land Fuel Jettison Limit Weight ( ❓ ) 에서 가려진 비상 회항 시나리오명은?", ans: "정답: Return to Land\n\n(이륙 직후 비상 회항 시 missed approach 고도 회복 상승성능 유지를 위해 설정하는 중량 한계입니다.)" },
+  { q: "GPS SIGNAL INTERFERENCE PROCEDURES ( ❓ ) 에서 가려진 비정상 GPS 조우 대응 지침 장은?", ans: "정답: POM 9.1.6\n\n(인천 및 김포 주변 GPS 교란 시 수동 비정렬 및 런웨이 오차 예방 수칙 장입니다.)" },
+  { q: "EDCT ( ❓ ) 에서 가려진 공식 관제 출발 지연 허가 타임 영문명은?", ans: "정답: Expect Departure Clearance Time\n\n(ATC 혼잡 시 배정되는 출발 보장 예정 시간입니다. 푸시백이 아닌 이륙 시간 기준입니다.)" }
+];
+
+// ── SUBJECTIVE (SHORT ANSWER) QUIZ DATA (30 QUESTIONS) ──
+const SUBJECTIVE_QUIZ_DATA = [
+  {
+    id: "sa-1",
+    cat: "lim",
+    q: "All Call 운항 중 운항 승무원과 객실 승무원 간의 '비상 호출 기내 표준 신호'는 송수신 측에 따라 어떻게 규정되어 있습니까?",
+    ans: "운항에서 객실로 전달 시 “5, 5” 이며, 객실에서 조종실(운항)로 전달 시 “*, *” 입니다.",
+    keywords: ["5, 5", "*, *", "운항", "객실"]
+  },
+  {
+    id: "sa-2",
+    cat: "lim",
+    q: "당사 FOM 규정상 B787 항공기의 소방 구조 등급은 무엇이며, 대형 항공기 중 어떤 기종들과 동일 등급입니까?",
+    ans: "ICAO 9 등급 (FAA E 등급)에 속하며, A350, A330-300, B777, B747-400 기종과 동일 등급입니다.",
+    keywords: ["9 등급", "A350", "B777"]
+  },
+  {
+    id: "sa-3",
+    cat: "lim",
+    q: "FAA ADG (Airplane Design Group) 항공기 설계 등급에 의거, B787의 등급명과 이를 분류하는 2가지 물리적 치수 기준은 무엇입니까?",
+    ans: "FAA ADG Group V에 속하며, 윙스팬(Wingspan)과 꼬리날개 높이(Tail Height)를 기준으로 분류합니다.",
+    keywords: ["V", "Wingspan", "Tail Height", "윙스팬", "꼬리"]
+  },
+  {
+    id: "sa-4",
+    cat: "lim",
+    q: "Jeppesen 접근 차트에 'Eye to Wheel Height가 22 ft 이상인 경우 주의'하라는 노트가 있을 때 B787이 이 경고 대상에 속하는 수치적 이유와 물리적 위험성을 설명하십시오.",
+    ans: "B787의 해당 높이는 23 ft로 22 ft 제한값 이상에 속합니다. 이로 인해 정상적으로 강하하더라도 주 착륙장치(Main Gear)가 활주로 진입단(Threshold)을 아슬아슬하게 낮게 통과할 수 있습니다.",
+    keywords: ["23", "23 ft", "주 착륙장치", "진입단", "22"]
+  },
+  {
+    id: "sa-5",
+    cat: "lim",
+    q: "B787-9 및 B787-10 기종의 활주로 접지 전 테일 스트라이크를 방지하기 위한 이륙/착륙 '테일 스트라이크 피치 한계각(Tail Strike Pitch Attitude)'은 각각 몇 도입니까?",
+    ans: "B787-9 기종의 한계는 7.8° (지상 클리어런스 청소각 고려 시 9.7°) 이며, 동체가 연장된 B787-10 기종의 한계는 6.8° 입니다.",
+    keywords: ["7.8", "6.8"]
+  },
+  {
+    id: "sa-6",
+    cat: "lim",
+    q: "B787-9과 B787-10의 최대 기압 고도 운영 제한(Maximum Operating Altitude)은 각각 얼마입니까?",
+    ans: "B787-9의 기압 고도 제한은 43,100 ft 이고, B787-10 기종은 41,100 ft 입니다.",
+    keywords: ["43,100", "41,100"]
+  },
+  {
+    id: "sa-7",
+    cat: "lim",
+    q: "활주로 180도 선회(Turns of 180 Degrees)를 무리 없이 수행하기 위해 안전상 요구되는 최소 포장 도로 폭(Min pavement width)은 기종별로 각각 얼마입니까?",
+    ans: "B787-9은 154 ft (47.0 m) 이고, B787-10은 176 ft 7 inches (53.8 m) 입니다.",
+    keywords: ["47", "154", "53.8", "176"]
+  },
+  {
+    id: "sa-8",
+    cat: "lim",
+    q: "LAND 2 또는 LAND 3 자동 착륙 자격 지시가 뜨지 않은 일반 수동 어프로치 단계에서, Autopilot을 반드시 해제(Disengage)해야 하는 최저 한계 고도는 기종별로 각각 얼마입니까?",
+    ans: "B787-9은 135 ft AGL 이고, B787-10은 100 ft AGL 입니다.",
+    keywords: ["135", "100", "AGL"]
+  },
+  {
+    id: "sa-9",
+    cat: "lim",
+    q: "오토 브레이크 작동 중 RTO(Rejected Takeoff) 자동 제동압 명령이 활성화되기 위한 지상속도(Groundspeed) 하한선 수치 한계는 얼마입니까?",
+    ans: "지상속도가 반드시 85 knots를 초과(above 85 knots)한 상태여야 오토브레이크 RTO 제동이 동작합니다.",
+    keywords: ["85", "85 knots", "초과"]
+  },
+  {
+    id: "sa-10",
+    cat: "norm",
+    q: "IAN(통합 접근 항법) 옵션 오류로 VMC 비행 중 오경보에 의한 'GLIDESLOPE' 음성 경보가 지속적으로 트리거될 때 소거하기 위해 조종사가 가동해야 하는 장치의 정식 명칭은 무엇입니까?",
+    ans: "오버헤드 패널에 위치한 'BELOW G/S' 또는 'G/S INHIBIT' 스위치입니다.",
+    keywords: ["BELOW G/S", "G/S INHIBIT", "스위치"]
+  },
+  {
+    id: "sa-11",
+    cat: "norm",
+    q: "이륙 상승 중 NADP2 조건 하에서 이륙 플랩 세팅이 FLAPS 5보다 큰(greater than) 경우, 조기 추진력 제한 차단 방지를 위해 입력해야 하는 'Thrust Reduction' 고도는 몇 피트입니까?",
+    ans: "Thrust Reduction Point 고도를 1,500 ft로 상향 지정하여 입력해야 합니다.",
+    keywords: ["1,500", "1500", "ft"]
+  },
+  {
+    id: "sa-12",
+    cat: "norm",
+    q: "지상 택시 및 라인업 중 센서 가동 불일치로 인한 오경보인 'FMC RUNWAY DISAGREE' 발생을 예방하기 위해 준수하도록 권장되는 최대 가용 테스트 추력은 얼마입니까?",
+    ans: "최대 58% N1을 초과하여 추력을 공급하지 않아야 합니다.",
+    keywords: ["58% N1", "58%", "N1"]
+  },
+  {
+    id: "sa-13",
+    cat: "norm",
+    q: "지상 시동 전 에어플로우 서지 방지를 위해 기장이나 부기장이 에어컨 설정 창에 입력해야 하는 Cabin Occupants(승객 설정값) 표준 세팅값은 기종별로 각각 얼마입니까?",
+    ans: "B787-8/-9 기종은 318명, B787-10 기종은 337명으로 설정합니다.",
+    keywords: ["318", "337", "명"]
+  },
+  {
+    id: "sa-14",
+    cat: "norm",
+    q: "항공기 이송(Towing Power Mode) 모드로 기체를 견인 중일 때, 조종실 내에서 사용할 수 없도록 전원이 완벽히 차단(not energized)되는 대표적인 안전 시스템은 무엇입니까?",
+    ans: "무선 무전 통신 시스템 (Radio communication systems) 입니다.",
+    keywords: ["무선 통신", "Radio", "통신"]
+  },
+  {
+    id: "sa-15",
+    cat: "norm",
+    q: "지상 엔진 시동을 마친 후 2차 엔진 지표(Secondary indications) 창이 닫혔음에도 팩 결함 메시지(PACK L/R)가 계속 뜰 때, Fault로 판정하는 시간 기준은 어떻게 정의됩니까?",
+    ans: "두 번째 엔진이 러닝을 개시하고 정상 가온 상태에 도달한 후 1분을 초과하여 표시가 유지되는 경우입니다.",
+    keywords: ["1분", "두 번째", "초과"]
+  },
+  {
+    id: "sa-16",
+    cat: "weather",
+    q: "연료 방출(Fuel Jettison) 절차를 완료한 후에도 안전상 메인 연료 탱크(Main Tank)에 무조건 잔류 보존되도록 프로그램된 최소 잔류 연료량은 각각 얼마입니까?",
+    ans: "좌우 각 Main Tank에 최소 8,700 lbs가 잔류하게 됩니다.",
+    keywords: ["8,700", "8700", "lbs"]
+  },
+  {
+    id: "sa-17",
+    cat: "weather",
+    q: "자동 연료 밸런싱(Fuel Balance System)의 작동이 강제 차단(Inhibited) 처리되는 조건 3가지 이상을 서술하십시오.",
+    ans: "연료 주유/배유 시, 시스템 결함 발생 시, Center tank pump 가 가동 중일 때, 지상에서 엔진이 1개 이상 켜져 있을 때, 연료 제트저니 중이거나 FUEL DISAGREE 및 FUEL QTY LOW 메세지 표시 시 가동이 금지됩니다.",
+    keywords: ["refueling", "pump", "running", "jettison", "disagree", "low", "시동", "주유"]
+  },
+  {
+    id: "sa-18",
+    cat: "weather",
+    q: "3% Contingency Fuel 운항 관리 절차를 적용하기 위한 3% ERA (Enroute Alternate) 공항의 지리적 위치 선정 기준을 설명하십시오.",
+    ans: "목적지까지 총 비행 계획 거리의 25% 지점 또는 20%에 50 NM을 합산한 지점을 중심으로 삼고, 총 비행 계획 거리의 20%에 해당하는 거리를 반경으로 하는 원 영역 내에 위치해야 합니다.",
+    keywords: ["25%", "20%", "50 NM", "반경"]
+  },
+  {
+    id: "sa-19",
+    cat: "weather",
+    q: "B787-9/-10 항공기가 최적 순항 고도(Optimum Cruise Alt) 대비 8,000 ft 아래 고도에서 강하 비행 시 발생하는 Trip Fuel 소모 연료 패널티 가중 비율은 몇 %입니까?",
+    ans: "LRC 속도 비행 시 약 5%의 연료 연소 페널티(Trip fuel penalty)가 추가 소모됩니다.",
+    keywords: ["5%", "5", "페널티"]
+  },
+  {
+    id: "sa-20",
+    cat: "weather",
+    q: "지상 OAT 기온이 3°C 이하인 결빙 조우(Icing Condition) 상태에서 대기 중인 경우, 엔진 가열 제방빙을 위해 수행해야 하는 엔진 런업(Run-up) 점검 주기와 도달 목표 추력 조건은 어떻게 됩니까?",
+    ans: "매 60분 간격 이내에 최소 40% N1 이상의 추력을 인가하여 최소 5초 동안 런업 상태를 가온 유지해주어야 합니다.",
+    keywords: ["60분", "40%", "5초", "N1"]
+  },
+  {
+    id: "sa-21",
+    cat: "weather",
+    q: "지상 OAT 대기 온도가 몇 도를 초과할 때, 엔진 시동 보호를 위해 두 엔진의 동시 시동(Starting both engines at the same time) 조작이 엄격히 금지됩니까?",
+    ans: "외기 온도 OAT 40°C를 초과하는 극 고온 환경입니다.",
+    keywords: ["40°C", "40", "초과"]
+  },
+  {
+    id: "sa-22",
+    cat: "weather",
+    q: "기내 연료 가온 온도가 -17°C 이하인 상태에서 시동 전 전기 유압 펌프가 10분 이상 정지되어 작동되지 않았다면 조종사는 시동 전 어떤 조치를 취해야 합니까?",
+    ans: "내부 캐비테이션 예방 및 유체 가열을 위해 즉시 정비사(maintenance personnel)에게 통보하여 시스템 가열 절차 수행을 요청해야 합니다.",
+    keywords: ["정비사", "maintenance", "통보"]
+  },
+  {
+    id: "sa-23",
+    cat: "weather",
+    q: "이륙 중 지상 75노트 미만 조건일 때 착빙 오작동을 예방하기 위해 내부 로직에 의해 수동 가동이 자동으로 강제 차단(Inhibited)되는 시스템 2가지는 무엇입니까?",
+    ans: "자동 결빙 감지 시스템(Automatic ice detection) 및 윙 방빙 시스템(Wing anti-ice) 입니다.",
+    keywords: ["결빙 감지", "윙 방빙", "wing", "detection"]
+  },
+  {
+    id: "sa-24",
+    cat: "weather",
+    q: "결빙 조우 상태로 운항 후 착륙 하였을 때, 활주로 contamination 등에 의해 플랩/슬랫을 수납하지 않고 전개 상태를 그대로 유지하도록 강제하는 대표적 시나리오 조건 3가지를 서술하십시오.",
+    ans: "착륙 전 플랩/슬랫을 전개한 채 장시간 결빙 영역에 홀딩 비행하였거나, 기체 표면 결빙 퇴적이 강하게 의심될 때, 눈이나 얼음 슬러시가 가득 찬 오염된 활주로 및 유도로를 택시 중일 때 수납이 금지됩니다.",
+    keywords: ["홀딩", "contaminated", "퇴적", "오염", "ice"]
+  },
+  {
+    id: "sa-25",
+    cat: "nonnorm",
+    q: "속도계 비신뢰(AIRSPEED UNRELIABLE) 발생 시, 기수 비상 제어를 위해 플랩 상태별 즉각 인가 고정해야 하는 암기 피치 각도(Pitch Attitude)와 N1 추력 세팅 조합을 수치와 함께 답하십시오.",
+    ans: "플랩 전개 상태(Flaps extended): 10° 피치 및 85% N1 / 플랩 수납 상태(Flaps up): 4° 피치 및 70% N1 입니다.",
+    keywords: ["10°", "85%", "4°", "70%", "N1"]
+  },
+  {
+    id: "sa-26",
+    cat: "nonnorm",
+    q: "계기 이륙 거부(RTO)를 판단 시 지상속도 80 knots 이전에 발생한 속도 이상과 80 knots 이후에 발생한 속도 이상 상황 하에서 HUD 및 비행 계속 여부(Go/No Go) 지침의 차이는 무엇입니까?",
+    ans: "80kts 이전에 속도 표시 상실을 인지하면 Rejected Takeoff(이륙 거부)를 개시하고, 80kts를 초과한 이후에는 이륙을 그대로 계속(continue) 진행해야 합니다.",
+    keywords: ["이전", "이륙 거부", "이후", "계속", "Reject", "Continue"]
+  },
+  {
+    id: "sa-27",
+    cat: "nonnorm",
+    q: "비행 중 복합 기체 이상으로 발생한 양 엔진 이중 실화(Dual Eng Fail/Stall) 상황 시 메모리 아이템 조치 3단계를 순서대로 답하십시오.",
+    ans: "1) FUEL CONTROL 스위치 양쪽 모두 CUTOFF 후 RUN, 2) RAM AIR TURBINE 스위치를 1초간 길게 누름, 3) 윈드밀 스타트를 위해 270 knots 이상의 속도를 세팅 및 유지하는 것입니다.",
+    keywords: ["CUTOFF", "RUN", "RAT", "270"]
+  },
+  {
+    id: "sa-28",
+    cat: "nonnorm",
+    q: "기체 복구 회항 등으로 최대착륙중량(MLW)과 최대이륙중량(MTOW) 상태에서 중량 초과 착륙(Overweight Landing) 시 타이어 및 축 파손 예방을 위한 각각의 최대 접지 강하율(Sink rate) 한계 수치는 얼마입니까?",
+    ans: "최대 착륙 중량(MLW) 이하에서는 600 fpm, 최대 이륙 중량(MTOW) 근접 상태에서는 360 fpm 이내의 강하율을 준수해야 접지 한계 손상을 방지할 수 있습니다.",
+    keywords: ["600 fpm", "360 fpm", "MLW", "MTOW"]
+  },
+  {
+    id: "sa-29",
+    cat: "nonnorm",
+    q: "비행 중 2개 이상의 독립된 시스템 결함(Multiple Malfunctions)이 누적되어 각각 다른 Non-Normal Landing Distance가 제시되었을 때, 보잉 공식 답변에 규정된 합리적 착륙 활주거리 계산 조합 원칙은 무엇입니까?",
+    ans: "정상 상태 기준 착륙거리(base)를 구한 후, 개별 고장 장치 1과 고장 장치 2가 유발하는 각각의 누적 증가분(increment)을 각각 계산하여 기준 정상 거리에 합산(apply both increments to the base)해야 합니다.",
+    keywords: ["정상", "기준", "증가분", "합산", "increment", "base"]
+  },
+  {
+    id: "sa-30",
+    cat: "nonnorm",
+    q: "FAA 권고에 맞춰 전면 개정된 지상 주기 중 엔진 화재(FIRE ENG L/R on Ground) 경보 시, 인플라이트 상황과 대조되는 가장 핵심적인 조종사의 지상 행동 지침 차이는 무엇입니까?",
+    ans: "지상에서는 비행 중과 달리 메모리 아이템(Memory Item)을 절차 상 선 기동하지 않으며, 즉시 소화병을 지체 없이 기동하기 위해 '[ ] FIRE ENG L, R' 전자기 체크리스트(ECL)를 직접 Read & Do로 즉시 수행합니다.",
+    keywords: ["메모리", "미수행", "ECL", "즉시", "Read"]
+  }
+];
+
+let solvedList = new Set();
+let currentCategory = 'all';
+let viewMode = 'mcq'; // 'mcq', 'sa', or 'fc'
+let subSolvedStatus = {}; // Subjective grading status map
+
+function changeFontSize(dir) {
+  let size = parseInt(document.getElementById('fontLabel').textContent);
+  size += dir;
+  if (size < 11) size = 11;
+  if (size > 24) size = 24;
+  document.getElementById('fontLabel').textContent = size + 'px';
+  document.documentElement.style.setProperty('--quiz-font-size', size + 'px');
+}
+
+function selectCategory(cat) {
+  currentCategory = cat;
+  document.querySelectorAll('.nav-tab').forEach(t => {
+    t.classList.remove('bg-slate-950', 'text-white', 'bg-emerald-600', 'text-emerald-50', 'bg-sky-600', 'text-sky-50', 'bg-slate-100');
+    if (t.id === 'tab-fc') {
+      t.classList.add('text-emerald-600');
+    } else if (t.id === 'tab-sa') {
+      t.classList.add('text-sky-600');
+    } else {
+      t.classList.add('text-slate-600');
+    }
+  });
+
+  const activeTab = document.getElementById('tab-' + cat);
+  if (cat === 'fc') {
+    activeTab.classList.add('bg-emerald-600', 'text-emerald-50');
+    viewMode = 'fc';
+  } else if (cat === 'sa') {
+    activeTab.classList.add('bg-sky-600', 'text-sky-50');
+    viewMode = 'sa';
+  } else {
+    activeTab.classList.add('bg-slate-950', 'text-white');
+    viewMode = 'mcq';
+  }
+  render();
+}
+
+function startRandomQuiz() {
+  currentCategory = 'random';
+  viewMode = 'mcq';
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('bg-slate-950', 'text-white', 'bg-emerald-600', 'text-emerald-50', 'bg-sky-600', 'text-sky-50'));
+  renderRandom();
+}
+
+function resetSolves() {
+  solvedList.clear();
+  subSolvedStatus = {};
+  localStorage.removeItem('b787_quiz_solved');
+  localStorage.removeItem('b787_sub_solved_status');
+  updateSolvedCount();
+  render();
+}
+
+function updateSolvedCount() {
+  const total = SYSTEM_QUIZ_DATA.lim.length + SYSTEM_QUIZ_DATA.norm.length + SYSTEM_QUIZ_DATA.weather.length + SYSTEM_QUIZ_DATA.nonnorm.length + SUBJECTIVE_QUIZ_DATA.length;
+  document.getElementById('totalCount').textContent = total;
+  document.getElementById('solvedCount').textContent = solvedList.size;
+}
+
+function markSolved(id) {
+  solvedList.add(id);
+  localStorage.setItem('b787_quiz_solved', JSON.stringify([...solvedList]));
+  updateSolvedCount();
+}
+
+function gradeSubjective(id, scoreType) {
+  subSolvedStatus[id] = scoreType;
+  localStorage.setItem('b787_sub_solved_status', JSON.stringify(subSolvedStatus));
+  
+  const badgeContainer = document.getElementById(`grade-badge-container-${id}`);
+  let badgeHtml = '';
+  if (scoreType === 'perfect') {
+    badgeHtml = `<span class="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded-full border border-emerald-200">완벽히 암기함 🌟</span>`;
+  } else if (scoreType === 'partial') {
+    badgeHtml = `<span class="bg-amber-100 text-amber-800 text-[10px] font-bold px-2 py-0.5 rounded-full border border-amber-200">부분 기억함 👍</span>`;
+  } else {
+    badgeHtml = `<span class="bg-rose-100 text-rose-800 text-[10px] font-bold px-2 py-0.5 rounded-full border border-rose-200">복습 필요 🔁</span>`;
+  }
+  badgeContainer.innerHTML = badgeHtml;
+}
+
+function render() {
+  const container = document.getElementById('quizContainer');
+  container.innerHTML = '';
+
+  // 1. 플래시카드 렌더링 (괄호 가림 카드 포함)
+  if (viewMode === 'fc') {
+    let html = `<div class="grid grid-cols-1 md:grid-cols-2 gap-4">`;
+    FLASHCARD_DATA.forEach((card, idx) => {
+      // 괄호 가림 카드는 프론트 파스텔 배경을 살짝 구분
+      const isParenthesesCard = card.q.includes('❓');
+      const cardTheme = isParenthesesCard ? 'from-amber-50 to-amber-100/30' : 'from-emerald-50 to-emerald-100/30';
+      const borderTheme = isParenthesesCard ? 'border-amber-200/60' : 'border-emerald-200/60';
+      html += `
+        <div class="flip-card h-52 cursor-pointer" id="fc-${idx}" onclick="flipCard(${idx})">
+          <div class="flip-card-inner shadow-xs rounded-2xl border ${borderTheme} bg-white transition-all duration-500 relative h-full">
+            <!-- 앞면 (질문) -->
+            <div class="flip-card-front p-4 flex flex-col justify-between rounded-2xl bg-gradient-to-br ${cardTheme} h-full">
+              <div class="flex items-center justify-between">
+                <span class="text-[9px] font-black tracking-wider text-slate-500 uppercase">${isParenthesesCard ? 'Parentheses Fill ✏️' : 'Flashcard [Oral] 💡'}</span>
+                <span class="text-xs text-slate-400 font-mono font-bold">#${idx + 1}</span>
+              </div>
+              <div class="text-slate-800 font-extrabold text-center text-xs md:text-sm my-auto px-2 leading-relaxed">${card.q}</div>
+              <div class="text-[9px] text-slate-400 text-center font-bold">탭하여 모범 정답 뒤집기 🔄</div>
+            </div>
+            <!-- 뒷면 (정답) -->
+            <div class="flip-card-back p-4 flex flex-col justify-between rounded-2xl bg-slate-900 text-white h-full">
+              <div class="flex items-center justify-between border-b border-slate-800 pb-1.5">
+                <span class="text-[9px] font-bold text-sky-400 uppercase">Answer Sheet</span>
+                <span class="text-xs text-slate-500 font-mono font-bold">#${idx + 1}</span>
+              </div>
+              <div class="text-xs leading-relaxed text-left my-auto text-slate-200 whitespace-pre-line font-medium overflow-y-auto no-scrollbar py-2 max-h-[120px]">${card.ans}</div>
+              <div class="text-[8px] text-sky-400/80 text-center font-extrabold">확인 완료 💡</div>
+            </div>
+          </div>
+        </div>
+      `;
+    });
+    html += `</div>`;
+    container.innerHTML = html;
+    return;
+  }
+
+  // 2. 주관식 평가 렌더링
+  if (viewMode === 'sa') {
+    let html = `
+      <div class="flex items-center justify-between border-b border-slate-200 pb-3 mb-4">
+        <h2 class="font-black text-slate-800 text-base flex items-center gap-2">
+          <span class="inline-block w-2 h-4 bg-sky-500 rounded-sm"></span>
+          ✍️ 주관식 키워드 매칭 평가 (${SUBJECTIVE_QUIZ_DATA.length}문항)
+        </h2>
+        <span class="text-[10px] bg-slate-100 text-slate-500 px-3 py-1 rounded-full font-bold">AI 키워드 진단</span>
+      </div>
+    `;
+
+    SUBJECTIVE_QUIZ_DATA.forEach((q, qidx) => {
+      const savedGrade = subSolvedStatus[q.id];
+      let statusBadge = '';
+      if (savedGrade === 'perfect') statusBadge = `<span class="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded-full border border-emerald-200">완벽히 암기함 🌟</span>`;
+      else if (savedGrade === 'partial') statusBadge = `<span class="bg-amber-100 text-amber-800 text-[10px] font-bold px-2 py-0.5 rounded-full border border-amber-200">부분 기억함 👍</span>`;
+      else if (savedGrade === 'needs_review') statusBadge = `<span class="bg-rose-100 text-rose-800 text-[10px] font-bold px-2 py-0.5 rounded-full border border-rose-200">복습 필요 🔁</span>`;
+
+      html += `
+        <div class="bg-white rounded-xl p-5 border border-slate-200 shadow-sm space-y-4 relative" id="card-${q.id}">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="text-[9px] bg-sky-900 text-sky-100 px-2 py-0.5 rounded-full font-mono font-bold">SA ${qidx + 1}</span>
+              <span class="text-[9px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">${q.cat.toUpperCase()}</span>
+            </div>
+            <div id="grade-badge-container-${q.id}">${statusBadge}</div>
+          </div>
+          
+          <!-- 주관식 질문 -->
+          <h4 class="font-extrabold text-slate-800 leading-relaxed q-text">${q.q}</h4>
+          
+          <!-- 입력 텍스트 영역 -->
+          <div>
+            <textarea id="user-ans-${q.id}" rows="3" 
+              class="w-full p-3 rounded-lg border border-slate-200 focus:border-sky-500 focus:ring-1 focus:ring-sky-500 text-xs font-semibold text-slate-700 outline-none transition resize-none"
+              placeholder="여기에 생각하신 정답 및 필수 수치/키워드를 자유롭게 작성해 보세요..."></textarea>
+          </div>
+
+          <!-- 검증 버튼 -->
+          <div class="flex justify-between items-center gap-2">
+            <button id="btn-check-${q.id}" onclick='checkSubjectiveAnswer("${q.id}", ${JSON.stringify(q.keywords)}, "${q.ans.replace(/"/g, '\\"')}")'
+              class="bg-slate-900 text-white hover:bg-slate-800 font-bold py-1.5 px-4 rounded-lg text-xs transition">
+              🔍 정답 및 키워드 매칭 분석
+            </button>
+          </div>
+
+          <!-- 스캔된 키워드 & 모범 답안 프레임 -->
+          <div id="match-result-${q.id}" class="space-y-2"></div>
+
+          <div id="model-ans-${q.id}" class="mt-4 p-4 rounded-xl border-l-4 bg-sky-50 border-sky-500 hidden shadow-inner">
+            <div class="font-black text-[11px] uppercase tracking-wider text-sky-700 mb-1">✓ MODEL REFERENCE MATRIX</div>
+            <p class="font-semibold text-slate-800 text-xs leading-relaxed">${q.ans}</p>
+            
+            <!-- 자가 채점 선택기 -->
+            <div id="grade-panel-${q.id}" class="mt-3 pt-3 border-t border-sky-200/50 flex flex-wrap items-center gap-2 hidden">
+              <span class="text-[10px] font-bold text-slate-500">자가 진척도 기록:</span>
+              <button onclick="gradeSubjective('${q.id}', 'perfect')" class="bg-white hover:bg-emerald-50 text-emerald-700 border border-slate-200 hover:border-emerald-300 font-bold px-2 py-1 rounded text-[10px] transition">🌟 완벽히 외움</button>
+              <button onclick="gradeSubjective('${q.id}', 'partial')" class="bg-white hover:bg-amber-50 text-amber-700 border border-slate-200 hover:border-amber-300 font-bold px-2 py-1 rounded text-[10px] transition">👍 대략 기억함</button>
+              <button onclick="gradeSubjective('${q.id}', 'needs_review')" class="bg-white hover:bg-rose-50 text-rose-700 border border-slate-200 hover:border-rose-300 font-bold px-2 py-1 rounded text-[10px] transition">🔁 복습 필요</button>
+            </div>
+          </div>
+        </div>
+      `;
+    });
+    container.innerHTML = html;
+    return;
+  }
+
+  // 3. 객관식 모드 렌더링
+  let targetQuestions = [];
+  if (currentCategory === 'all') {
+    targetQuestions = [...SYSTEM_QUIZ_DATA.lim, ...SYSTEM_QUIZ_DATA.norm, ...SYSTEM_QUIZ_DATA.weather, ...SYSTEM_QUIZ_DATA.nonnorm];
+  } else {
+    targetQuestions = SYSTEM_QUIZ_DATA[currentCategory] || [];
+  }
+
+  renderQuestionList(targetQuestions, "MEMO STUDY DECK");
+}
+
+function renderRandom() {
+  const container = document.getElementById('quizContainer');
+  const all = [...SYSTEM_QUIZ_DATA.lim, ...SYSTEM_QUIZ_DATA.norm, ...SYSTEM_QUIZ_DATA.weather, ...SYSTEM_QUIZ_DATA.nonnorm];
+  const shuffled = all.sort(() => 0.5 - Math.random());
+  const selected = shuffled.slice(0, 20);
+  renderQuestionList(selected, "🎲 랜덤 엄선 20제");
+}
+
+function renderQuestionList(list, subtitle) {
+  const container = document.getElementById('quizContainer');
+  let html = `
+    <div class="flex items-center justify-between border-b border-slate-200 pb-3 mb-4">
+      <h2 class="font-black text-slate-800 text-base flex items-center gap-2">
+        <span class="inline-block w-2 h-4 bg-sky-500 rounded-sm"></span>
+        ${subtitle} (${list.length}문항)
+      </h2>
+      <span class="text-[10px] bg-slate-100 text-slate-500 px-3 py-1 rounded-full font-bold">괄호/밑줄/볼드 핵심 매칭</span>
+    </div>
+  `;
+
+  list.forEach((q, qidx) => {
+    const qId = `q-${currentCategory}-${qidx}`;
+    html += `
+      <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-xs transition hover:shadow-sm relative overflow-hidden" id="card-${qId}">
+        <div class="flex items-center gap-2 mb-3">
+          <span class="text-[9px] bg-slate-900 text-slate-100 px-2 py-0.5 rounded-full font-mono font-bold">Q${qidx + 1}</span>
+          <span class="text-[9px] bg-sky-100 text-sky-700 px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">Memo Core</span>
+        </div>
+        
+        <!-- 문제 본문 -->
+        <h4 class="font-extrabold text-slate-800 leading-relaxed mb-4 q-text">${q.q}</h4>
+        
+        <!-- 오지선다 버튼 프레임 -->
+        <div class="space-y-2.5" id="opts-container-${qId}">
+          ${q.opts.map((opt, oidx) => `
+            <button onclick="handleAnswer('${qId}', ${oidx}, ${q.ans}, '${q.exp}')" 
+              class="w-full text-left p-3.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 hover:border-slate-300 font-semibold text-slate-700 transition flex items-start gap-3 opt-text relative"
+              id="btn-${qId}-${oidx}">
+              <span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-slate-200 text-slate-600 text-[10px] font-black shrink-0 mt-0.5">${String.fromCharCode(65 + oidx)}</span>
+              <span class="flex-1">${opt}</span>
+            </button>
+          `).join('')}
+        </div>
+        
+        <!-- 해설 패널 (기본 숨김) -->
+        <div class="mt-4 p-4 rounded-xl border-l-4 bg-emerald-50 border-emerald-500 hidden text-emerald-950 text-xs shadow-inner" id="explanation-${qId}">
+          <div class="font-black text-[11px] uppercase tracking-wider text-emerald-700 mb-1">✓ SYSTEM REFERENCE MATRIX</div>
+          <p class="font-medium leading-relaxed exp-text">${q.exp}</p>
+        </div>
+      </div>
+    `;
+  });
+
+  container.innerHTML = html;
+}
+
+function handleAnswer(qId, selectedIdx, correctIdx, explanation) {
+  const container = document.getElementById(`opts-container-${qId}`);
+  if (container.classList.contains('solved')) return;
+  
+  const selectedBtn = document.getElementById(`btn-${qId}-${selectedIdx}`);
+  const explanationPanel = document.getElementById(`explanation-${qId}`);
+
+  if (selectedIdx === correctIdx) {
+    selectedBtn.classList.remove('bg-slate-50', 'hover:bg-slate-100');
+    selectedBtn.classList.add('bg-emerald-500', 'text-white', 'border-emerald-600');
+    selectedBtn.querySelector('span').classList.add('bg-emerald-600', 'text-emerald-50');
+    selectedBtn.innerHTML += `<span class="absolute right-4 top-1/2 -translate-y-1/2 font-black text-white text-sm">✓</span>`;
+    
+    container.classList.add('solved');
+    explanationPanel.classList.remove('hidden');
+    
+    for (let i = 0; i < 4; i++) {
+      if (i !== selectedIdx) {
+        document.getElementById(`btn-${qId}-${i}`).disabled = true;
+        document.getElementById(`btn-${qId}-${i}`).classList.add('opacity-40');
+      }
+    }
+    
+    markSolved(qId);
+  } else {
+    selectedBtn.classList.remove('bg-slate-50', 'hover:bg-slate-100');
+    selectedBtn.classList.add('bg-rose-500', 'text-white', 'border-rose-600');
+    selectedBtn.querySelector('span').classList.add('bg-rose-600', 'text-rose-50');
+    selectedBtn.innerHTML += `<span class="absolute right-4 top-1/2 -translate-y-1/2 font-black text-white text-sm">✗</span>`;
+    selectedBtn.disabled = true;
+  }
+}
+
+function checkSubjectiveAnswer(id, correctKeywords, correctAnsText) {
+  const userText = document.getElementById(`user-ans-${id}`).value.trim();
+  const matchResultContainer = document.getElementById(`match-result-${id}`);
+  const modelAnsContainer = document.getElementById(`model-ans-${id}`);
+  const btn = document.getElementById(`btn-check-${id}`);
+  
+  modelAnsContainer.classList.remove('hidden');
+  
+  let matchHtml = `<div class="mt-3 flex flex-wrap gap-2 items-center">
+    <span class="text-[10px] font-bold text-slate-500 uppercase">키워드 매치 상태:</span>`;
+  
+  let matchedCount = 0;
+  correctKeywords.forEach(kw => {
+    const normalizedUser = userText.toLowerCase().replace(/\s+/g, '');
+    const normalizedKw = kw.toLowerCase().replace(/\s+/g, '');
+    const isMatched = normalizedUser.includes(normalizedKw);
+    
+    if (isMatched) {
+      matchedCount++;
+      matchHtml += `<span class="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded-md border border-emerald-200">✓ ${kw}</span>`;
+    } else {
+      matchHtml += `<span class="bg-slate-100 text-slate-400 text-[10px] font-bold px-2 py-0.5 rounded-md border border-slate-200 line-through">✗ ${kw}</span>`;
+    }
+  });
+  matchHtml += `</div>`;
+  
+  const matchRate = Math.round((matchedCount / correctKeywords.length) * 100);
+  matchResultContainer.innerHTML = `
+    <div class="mt-2 text-xs font-black text-slate-700">
+      분석 매칭율: <span class="${matchRate >= 50 ? 'text-emerald-600' : 'text-amber-600'}">${matchRate}%</span> (${matchedCount}/${correctKeywords.length}개 핵심 데이터 구체화 완료)
+    </div>
+    ${matchHtml}
+  `;
+  
+  document.getElementById(`grade-panel-${id}`).classList.remove('hidden');
+  btn.disabled = true;
+  btn.classList.add('opacity-50');
+  
+  markSolved(id);
+}
+
+function flipCard(idx) {
+  const card = document.getElementById(`fc-${idx}`);
+  card.classList.toggle('flipped');
+}
+
+window.onload = function() {
+  const savedSolves = localStorage.getItem('b787_quiz_solved');
+  if (savedSolves) {
+    solvedList = new Set(JSON.parse(savedSolves));
+  }
+  const savedGrades = localStorage.getItem('b787_sub_solved_status');
+  if (savedGrades) {
+    subSolvedStatus = JSON.parse(savedGrades);
+  }
+  updateSolvedCount();
+  selectCategory('all');
+};
+</script>
+</body>
+</html>
