@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>B787 Systems & Memo Comprehensive Quiz</title>
-<!-- Google Fonts (Inter & Noto Sans KR) 구글 웹폰트 추가 -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
@@ -37,11 +36,37 @@ body {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+/* 플립 카드 애니메이션 (Flashcard 전용) */
+.flip-card {
+  background-color: transparent;
+  perspective: 1000px;
+}
+.flip-card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-style: preserve-3d;
+}
+.flip-card.flipped .flip-card-inner {
+  transform: rotateY(180deg);
+}
+.flip-card-front, .flip-card-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  border-radius: 1.25rem;
+}
+.flip-card-back {
+  transform: rotateY(180deg);
+}
 </style>
 </head>
 <body class="min-h-screen flex flex-col antialiased">
 
-<!-- ── HEADER (미니멀 파스텔 실버 테마) ── -->
 <header class="bg-white/90 backdrop-blur-md sticky top-0 z-50 px-3 py-3 border-b border-blue-100/60 shadow-xs">
   <div class="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
     <div class="flex items-center gap-2.5 w-full sm:w-auto">
@@ -72,7 +97,6 @@ body {
   </div>
 </header>
 
-<!-- ── CATEGORY NAVIGATION (📂 카테고리 필터 단일 배치) ── -->
 <nav class="bg-white border-b border-slate-100 sticky top-[57px] sm:top-[53px] z-40 shadow-xs">
   <div class="max-w-4xl mx-auto flex items-center overflow-x-auto no-scrollbar gap-1.5 px-3 py-2">
     <span class="text-[11px] font-black text-slate-400 shrink-0 mr-1 select-none">카테고리</span>
@@ -81,12 +105,19 @@ body {
     <button onclick="setCategory('norm')" id="cat-norm" class="cat-tab px-3 py-1.5 text-xs font-extrabold rounded-full text-slate-500 hover:bg-slate-100 whitespace-nowrap transition">Normal &amp; OMB</button>
     <button onclick="setCategory('weather')" id="cat-weather" class="cat-tab px-3 py-1.5 text-xs font-extrabold rounded-full text-slate-500 hover:bg-slate-100 whitespace-nowrap transition">Weather &amp; Fuel</button>
     <button onclick="setCategory('nonnorm')" id="cat-nonnorm" class="cat-tab px-3 py-1.5 text-xs font-extrabold rounded-full text-slate-500 hover:bg-slate-100 whitespace-nowrap transition">Non-Normal</button>
+    
+    <!-- 소프트 파스텔 세로 구분선 -->
+    <span class="h-4 w-px bg-slate-200 mx-1 shrink-0"></span>
+
+    <span class="text-[11px] font-black text-slate-400 shrink-0 mr-1 select-none">학습모드</span>
+    <button onclick="setMode('mcq')" id="mode-mcq" class="mode-tab px-3 py-1 text-xs font-extrabold rounded-full text-white bg-blue-600 border border-blue-600 shadow-sm whitespace-nowrap transition">객관식 평가</button>
+    <button onclick="setMode('sa')" id="mode-sa" class="mode-tab px-3 py-1 text-xs font-extrabold rounded-full text-slate-500 hover:bg-slate-100 whitespace-nowrap transition">주관식 평가</button>
+    <button onclick="setMode('fc')" id="mode-fc" class="mode-tab px-3 py-1 text-xs font-extrabold rounded-full text-slate-500 hover:bg-slate-100 whitespace-nowrap transition">Flashcard</button>
   </div>
 </nav>
 
 <!-- ── MAIN AREA ── -->
 <main class="flex-1 max-w-4xl w-full mx-auto p-3 md:py-6">
-  <!-- 상단 비주얼 스키매틱 데크 (ID 추가 및 기본 상태 설정) -->
   <section id="visualSchematics" class="mb-6 grid grid-cols-1 md:grid-cols-2 gap-3">
     <!-- 테일 스트라이크 & 고도 마진 다이어그램 -->
     <div class="bg-white rounded-2xl p-3.5 border border-blue-100/50 shadow-xs flex flex-col justify-between">
@@ -143,17 +174,7 @@ body {
   <div id="quizContainer" class="space-y-4"></div>
 </main>
 
-<!-- ── FOOTER ── -->
-<footer class="bg-slate-900 text-slate-500 py-6 border-t border-slate-800 mt-auto text-center px-4 text-xs">
-  <div class="max-w-4xl mx-auto space-y-1">
-    <p class="font-semibold text-slate-300">B787 Type Rating Memo Study Deck</p>
-    <p class="text-[10px] text-slate-500">기내표준 신호, 소방 등급, 3% Contingency Fuel, Overweight Landing, Airspeed Unreliable 및 Cold/Hot WX 전 범위 수록</p>
-    <p class="text-[9px] text-slate-600 pt-2">&copy; 2026. B787 Systems Quiz App inside Canvas. All rights reserved.</p>
-  </div>
-</footer>
-
 <script>
-// ── SYSTEM QUIZ DATA ──
 const SYSTEM_QUIZ_DATA = {
   "sa": [], // JS Dynamic Map
   "lim": [
@@ -337,7 +358,7 @@ const SYSTEM_QUIZ_DATA = {
         "기종 공통으로 최대 승객 한계인 350명으로 설정"
       ],
       ans: 1,
-      exp: "EGC(엔진 기어 컨트롤러) 에어컨 불충분 기류로 인한 CAC 서지 방지를 위해, Cabin Occupants 세팅값을 B787-8/-9의 경우 318명, B787-10의 경우 337명으로 세팅하도록 절차화되어 있습니다."
+      exp: "에어컨 불충분 기류로 인한 CAC 서지 방지를 위해, Cabin Occupants 세팅값을 B787-8/-9의 경우 318명, B787-10의 경우 337명으로 세팅하도록 절차화되어 있습니다."
     },
     {
       id: "mcq-norm-6",
@@ -369,7 +390,7 @@ const SYSTEM_QUIZ_DATA = {
       opts: [
         "HIGH flow 모드는 Cargo Ventilation을 우선하고, LOW flow 모드는 Cabin Cooling을 우선한다.",
         "HIGH flow 모드는 Cabin Cooling을 우선하고, LOW flow 모드는 Cargo Ventilation을 우선한다.",
-        "HIGH/LOW 모기지에 관계없이 항상 Cabin Cooling만 최우선 공급된다.",
+        "HIGH/LOW 모드에 관계없이 항상 Cabin Cooling만 최우선 공급된다.",
         "BULK cargo 선택기가 AUTO일 때는 오직 LOW flow만 가용하다."
       ],
       ans: 0,
@@ -471,7 +492,7 @@ const SYSTEM_QUIZ_DATA = {
         "도착 지연 20분 초과 / 고도 변경 5,000 ft 초과 시 통보"
       ],
       ans: 1,
-      exp: "규정에 따르면 비비계획 대비 도착 시간이 15분을 초과해 지연되거나 고도 상승/하강 폭이 4,000 ft를 초과 변동 시 지상 통보 의무가 발생합니다."
+      exp: "규정에 따르면 비비계획 대비 도착 시간이 15분을 초과해 지연되거나 고도 상승/하강 폭이 4,000 ft를 초과 변시 지상 통보 의무가 발생합니다."
     },
     {
       id: "mcq-weather-7",
@@ -566,7 +587,7 @@ const SYSTEM_QUIZ_DATA = {
         "A/T ARM 스위치 OFF → F/D OFF → 자세 4도 고정",
         "FUEL CONTROL 스위치 양쪽 모두 CUTOFF 후 RUN → RAT 스위치 1초간 누름 → 속도 270 knots 이상 유지",
         "APU 시동 개시 → 오토 브레이크 RTO 세팅 → 기어 다운",
-        "화재 스위치 풀(Pull) → 연료 밸브 폐쇄 → 수동 강하"
+        "화재 스위치 풀(Pull) → 연료 밸브 폐쇄 → 수동 가온 강하"
       ],
       ans: 1,
       exp: "Dual Eng Fail/Stall의 메모리 아이템은 1) FUEL CONTROL 스위치 양쪽 CUTOFF 후 RUN, 2) RAM AIR TURBINE 스위치를 1초간 길게 눌러 전기/유압 비상 전원 공급, 3) 윈드밀 스타트 기류를 위해 속도를 270 knots 이상으로 유지하는 것입니다."
@@ -587,7 +608,7 @@ const SYSTEM_QUIZ_DATA = {
       id: "mcq-nonnorm-6",
       q: "엔진 고장 발생 후 기수 상승 중 고도가 1,500 ft AGL을 통과할 때의 자동 제어 추력 한계(Thrust Limit) 변화 및 이에 따른 조종사의 비행 지침으로 올바른 것은 무엇입니까?",
       opts: [
-        "가용 추력 한계가 CON(Maximum Continuous)으로 자동 고정소 조종사는 아무런 조작을 하지 않아도 된다.",
+        "가용 추력 한계가 CON(Maximum Continuous)으로 자동 고정되므로 조종사는 아무런 조작을 하지 않아도 된다.",
         "엔진 고장 상태로 1,500 ft AGL 통과 시 thrust limit이 CLB(Climb)로 자동 변경되므로, 오토스로틀(A/THR)을 해제하고 수동으로 추력을 증가시키는 것이 권장된다.",
         "thrust limit이 자동으로 TO/GA 최대 출력 상태로 지속 연장된다.",
         "자동 조종 오토스로틀이 해제되면서 역추력 제동 압력이 자동으로 차단되므로 조종사는 수동 제동을 준비해야 한다."
@@ -844,7 +865,7 @@ const SUBJECTIVE_QUIZ_DATA = [
     id: "sa-22",
     cat: "weather",
     q: "기내 연료 가온 온도가 -17°C 이하인 상태에서 시동 전 전기 유압 펌프가 10분 이상 정지되어 작동되지 않았다면 조종사는 시동 전 어떤 조치를 취해야 합니까?",
-    ans: "내부 캐비테이션 예방 및 유체의 안전 운전을 위해 즉시 정비사(maintenance personnel)에게 통보하여 시스템 가열 절차 수행을 요청해야 합니다.",
+    ans: "내부 캐비테이션 예방 및 유체 가열을 위해 즉시 정비사(maintenance personnel)에게 통보하여 시스템 가열 절차 수행을 요청해야 합니다.",
     keywords: ["정비사", "maintenance", "통보"]
   },
   {
@@ -859,7 +880,7 @@ const SUBJECTIVE_QUIZ_DATA = [
     cat: "weather",
     q: "결빙 조우 상태로 운항 후 착륙 하였을 때, 활주로 contamination 등에 의해 플랩/슬랫을 수납하지 않고 전개 상태를 그대로 유지하도록 강제하는 대표적 시나리오 조건 3가지를 서술하십시오.",
     ans: "착륙 전 플랩/슬랫을 전개한 채 장시간 결빙 영역에 홀딩 비행하였거나, 기체 표면 결빙 퇴적이 강하게 의심될 때, 눈이나 얼음 슬러시가 가득 찬 오염된 활주로 및 유도로를 택시 중일 때 수납이 금지됩니다.",
-    keywords: ["홀딩", "contaminated", "퇴적", "오염", "ice"]
+    keywords: ["holding", "contaminated", "ice", "결빙", "오염"]
   },
   {
     id: "sa-25",
@@ -1047,12 +1068,12 @@ function startRandomQuiz() {
     t.className = "cat-tab px-3 py-1.5 text-xs font-extrabold rounded-full text-slate-500 hover:bg-slate-100 whitespace-nowrap transition";
   });
   document.querySelectorAll('.mode-tab').forEach(t => {
-    t.className = "mode-tab px-3 py-1 text-xs font-extrabold rounded-full text-slate-500 hover:bg-slate-100 whitespace-nowrap transition";
+    t.className = "mode-tab px-3 py-1.5 text-xs font-extrabold rounded-lg text-slate-500 hover:bg-slate-100 whitespace-nowrap transition";
   });
   
   const mcqTab = document.getElementById('mode-mcq');
   if (mcqTab) {
-    mcqTab.className = "mode-tab px-3 py-1 text-xs font-extrabold rounded-full text-white bg-blue-600 border border-blue-600 shadow-sm whitespace-nowrap transition";
+    mcqTab.className = "mode-tab px-3 py-1.5 text-xs font-extrabold rounded-lg text-white bg-blue-600 border border-blue-600 shadow-sm whitespace-nowrap transition";
   }
   
   renderRandom();
@@ -1303,6 +1324,7 @@ function render() {
         `;
       });
     }
+    html += `</div>`;
     container.innerHTML = html;
     return;
   }
@@ -1375,70 +1397,61 @@ function renderQuestionList(list, subtitle) {
     </div>
   `;
 
-  if (list.length === 0) {
+  list.forEach((q, qidx) => {
+    const qId = q.id;
+    const isSolved = solvedList.has(qId);
+    
     html += `
-      <div class="bg-white rounded-xl p-8 text-center text-slate-400 border border-slate-200 shadow-xs">
-        <span class="text-3xl">📂</span>
-        <p class="mt-2 text-xs font-bold">선택하신 카테고리에 객관식 평가 문항이 배정되어 있지 않습니다.</p>
+      <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-xs transition hover:shadow-sm relative overflow-hidden" id="card-${qId}">
+        <div class="flex items-center gap-2 mb-3">
+          <span class="text-[9px] bg-slate-900 text-slate-100 px-2 py-0.5 rounded-full font-mono font-bold">Q${qidx + 1}</span>
+          <span class="text-[9px] bg-sky-100 text-sky-700 px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">Memo Core</span>
+          ${isSolved ? '<span class="bg-emerald-100 text-emerald-800 text-[9px] font-bold px-2 py-0.5 rounded-full">완료 ✓</span>' : ''}
+        </div>
+        
+        <!-- 문제 본문 -->
+        <h4 class="font-extrabold text-slate-800 leading-relaxed mb-4 q-text">${q.q}</h4>
+        
+        <!-- 오지선다 버튼 프레임 -->
+        <div class="space-y-2.5 ${isSolved ? 'solved' : ''}" id="opts-container-${qId}">
+          ${q.opts.map((opt, oidx) => {
+            // 이미 풀었을 때 렌더링 상태 보존
+            let btnClass = 'bg-slate-50 hover:bg-slate-100 hover:border-slate-300 text-slate-700';
+            let labelClass = 'bg-slate-200 text-slate-600';
+            let iconMarkup = '';
+            let disabledAttr = '';
+
+            if (isSolved) {
+              disabledAttr = 'disabled';
+              if (oidx === q.ans) {
+                btnClass = 'bg-emerald-500 text-white border-emerald-600';
+                labelClass = 'bg-emerald-600 text-emerald-50';
+                iconMarkup = `<span class="absolute right-4 top-1/2 -translate-y-1/2 font-black text-white text-sm">✓</span>`;
+              } else {
+                btnClass = 'bg-slate-50 text-slate-700 opacity-40';
+              }
+            }
+
+            return `
+              <button onclick="handleAnswer('${qId}', ${oidx})" 
+                class="w-full text-left p-3.5 rounded-xl border border-slate-200 font-semibold transition flex items-start gap-3 opt-text relative ${btnClass}"
+                id="btn-${qId}-${oidx}" ${disabledAttr}>
+                <span class="inline-flex items-center justify-center w-5 h-5 rounded-full text-[10px] font-black shrink-0 mt-0.5 ${labelClass}">${String.fromCharCode(65 + oidx)}</span>
+                <span class="flex-1">${opt}</span>
+                ${iconMarkup}
+              </button>
+            `;
+          }).join('')}
+        </div>
+        
+        <!-- 해설 패널 -->
+        <div class="mt-4 p-4 rounded-xl border-l-4 bg-emerald-50 border-emerald-500 ${isSolved ? '' : 'hidden'} text-emerald-950 text-xs shadow-inner" id="explanation-${qId}">
+          <div class="font-black text-[11px] uppercase tracking-wider text-emerald-700 mb-1">✓ SYSTEM REFERENCE MATRIX</div>
+          <p class="font-medium leading-relaxed exp-text">${q.exp}</p>
+        </div>
       </div>
     `;
-  } else {
-    list.forEach((q, qidx) => {
-      const qId = q.id;
-      const isSolved = solvedList.has(qId);
-      
-      html += `
-        <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-xs transition hover:shadow-sm relative overflow-hidden" id="card-${qId}">
-          <div class="flex items-center gap-2 mb-3">
-            <span class="text-[9px] bg-slate-900 text-slate-100 px-2 py-0.5 rounded-full font-mono font-bold">Q${qidx + 1}</span>
-            <span class="text-[9px] bg-sky-100 text-sky-700 px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">Memo Core</span>
-            ${isSolved ? '<span class="bg-emerald-100 text-emerald-800 text-[9px] font-bold px-2 py-0.5 rounded-full">완료 ✓</span>' : ''}
-          </div>
-          
-          <!-- 문제 본문 -->
-          <h4 class="font-extrabold text-slate-800 leading-relaxed mb-4 q-text">${q.q}</h4>
-          
-          <!-- 오지선다 버튼 프레임 -->
-          <div class="space-y-2.5 ${isSolved ? 'solved' : ''}" id="opts-container-${qId}">
-            ${q.opts.map((opt, oidx) => {
-              // 이미 풀었을 때 렌더링 상태 보존
-              let btnClass = 'bg-slate-50 hover:bg-slate-100 hover:border-slate-300 text-slate-700';
-              let labelClass = 'bg-slate-200 text-slate-600';
-              let iconMarkup = '';
-              let disabledAttr = '';
-
-              if (isSolved) {
-                disabledAttr = 'disabled';
-                if (oidx === q.ans) {
-                  btnClass = 'bg-emerald-500 text-white border-emerald-600';
-                  labelClass = 'bg-emerald-600 text-emerald-50';
-                  iconMarkup = `<span class="absolute right-4 top-1/2 -translate-y-1/2 font-black text-white text-sm">✓</span>`;
-                } else {
-                  btnClass = 'bg-slate-50 text-slate-700 opacity-40';
-                }
-              }
-
-              return `
-                <button onclick="handleAnswer('${qId}', ${oidx})" 
-                  class="w-full text-left p-3.5 rounded-xl border border-slate-200 font-semibold transition flex items-start gap-3 opt-text relative ${btnClass}"
-                  id="btn-${qId}-${oidx}" ${disabledAttr}>
-                  <span class="inline-flex items-center justify-center w-5 h-5 rounded-full text-[10px] font-black shrink-0 mt-0.5 ${labelClass}">${String.fromCharCode(65 + oidx)}</span>
-                  <span class="flex-1">${opt}</span>
-                  ${iconMarkup}
-                </button>
-              `;
-            }).join('')}
-          </div>
-          
-          <!-- 해설 패널 -->
-          <div class="mt-4 p-4 rounded-xl border-l-4 bg-emerald-50 border-emerald-500 ${isSolved ? '' : 'hidden'} text-emerald-950 text-xs shadow-inner" id="explanation-${qId}">
-            <div class="font-black text-[11px] uppercase tracking-wider text-emerald-700 mb-1">✓ SYSTEM REFERENCE MATRIX</div>
-            <p class="font-medium leading-relaxed exp-text">${q.exp}</p>
-          </div>
-        </div>
-      `;
-    });
-  }
+  });
 
   container.innerHTML = html;
 }
