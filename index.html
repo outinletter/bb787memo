@@ -4,186 +4,546 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>B787 Systems & Memo Comprehensive Quiz</title>
-<!-- Tailwind CSS CDN -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Noto+Sans+KR:wght@400;500;700;900&family=Barlow+Condensed:wght@600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.tailwindcss.com"></script>
 <style>
 :root {
   --quiz-font-size: 14px;
+  --bg: #0b0e14;
+  --surface: #111620;
+  --surface2: #171d2b;
+  --border: #1e2a3d;
+  --border2: #243044;
+  --accent: #38bdf8;
+  --accent2: #0ea5e9;
+  --accent-glow: rgba(56,189,248,0.15);
+  --green: #34d399;
+  --green-bg: rgba(52,211,153,0.1);
+  --rose: #fb7185;
+  --rose-bg: rgba(251,113,133,0.1);
+  --amber: #fbbf24;
+  --amber-bg: rgba(251,191,36,0.1);
+  --text: #e2e8f0;
+  --text-muted: #64748b;
+  --text-dim: #94a3b8;
 }
+* { box-sizing: border-box; }
 body {
-  font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, 'Malgun Gothic', sans-serif;
-  background-color: #f4f7fc;
-  color: #1e293b;
+  font-family: 'Noto Sans KR', 'Malgun Gothic', sans-serif;
+  background-color: var(--bg);
+  background-image:
+    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(56,189,248,0.06) 0%, transparent 60%),
+    repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(30,42,61,0.4) 40px),
+    repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(30,42,61,0.2) 40px);
+  color: var(--text);
   -webkit-tap-highlight-color: transparent;
+  min-height: 100vh;
 }
-.q-text {
-  font-size: var(--quiz-font-size);
+.q-text { font-size: var(--quiz-font-size); }
+.opt-text { font-size: calc(var(--quiz-font-size) - 1px); }
+.exp-text { font-size: calc(var(--quiz-font-size) - 2px); }
+
+/* ── HEADER ── */
+.app-header {
+  background: rgba(11,14,20,0.92);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border);
+  position: sticky; top: 0; z-index: 50;
 }
-.opt-text {
-  font-size: calc(var(--quiz-font-size) - 1px);
+.app-header::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  opacity: 0.4;
 }
-.exp-text {
-  font-size: calc(var(--quiz-font-size) - 2px);
+.logo-badge {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  font-size: 1.1rem;
+  color: var(--accent);
+  text-shadow: 0 0 20px rgba(56,189,248,0.4);
 }
-/* 플립 카드 애니메이션 (Flashcard 전용) */
+
+/* ── NAV ── */
+.app-nav {
+  background: rgba(11,14,20,0.85);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  z-index: 40;
+}
+.nav-tab {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700;
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 6px 14px;
+  border-radius: 4px;
+  color: var(--text-muted);
+  border: 1px solid transparent;
+  transition: all 0.18s ease;
+  white-space: nowrap;
+  cursor: pointer;
+  background: transparent;
+}
+.nav-tab:hover { color: var(--text-dim); border-color: var(--border2); }
+.nav-tab.tab-active-mcq {
+  color: var(--accent);
+  border-color: var(--accent);
+  background: var(--accent-glow);
+  box-shadow: 0 0 12px rgba(56,189,248,0.15);
+}
+.nav-tab.tab-active-sa {
+  color: var(--amber);
+  border-color: var(--amber);
+  background: var(--amber-bg);
+}
+.nav-tab.tab-active-fc {
+  color: var(--green);
+  border-color: var(--green);
+  background: var(--green-bg);
+}
+
+/* ── STATUS CHIP ── */
+.status-chip {
+  font-family: 'JetBrains Mono', monospace;
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  border-radius: 6px;
+  padding: 4px 10px;
+  font-size: 0.7rem;
+  display: flex; align-items: center; gap: 6px;
+}
+.font-ctrl {
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  border-radius: 6px;
+  padding: 2px;
+  display: flex; align-items: center;
+}
+.font-ctrl button {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 700;
+  font-size: 0.7rem;
+  color: var(--text-dim);
+  padding: 2px 8px;
+  border-radius: 4px;
+  border: none; background: transparent; cursor: pointer;
+  transition: all 0.15s;
+}
+.font-ctrl button:hover { background: var(--border); color: var(--accent); }
+.font-ctrl span {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  padding: 0 4px;
+}
+.btn-random {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700;
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+  background: var(--accent);
+  color: #0b0e14;
+  border: none; border-radius: 6px;
+  padding: 6px 14px;
+  cursor: pointer;
+  transition: all 0.18s;
+  display: flex; align-items: center; gap: 6px;
+}
+.btn-random:hover { background: #7dd3fc; transform: translateY(-1px); box-shadow: 0 4px 16px rgba(56,189,248,0.3); }
+.btn-random:active { transform: scale(0.97); }
+
+/* ── DIAGRAM CARDS ── */
+.diagram-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+  position: relative;
+  overflow: hidden;
+}
+.diagram-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+}
+.diagram-svg-frame {
+  background: rgba(11,14,20,0.6);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+/* ── MCQ CARDS ── */
+.quiz-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  position: relative;
+  transition: border-color 0.2s;
+}
+.quiz-card:hover { border-color: var(--border2); }
+.quiz-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0;
+  width: 3px; height: 100%;
+  background: linear-gradient(180deg, var(--accent), transparent);
+  border-radius: 12px 0 0 12px;
+  opacity: 0.5;
+}
+.q-num-badge {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 700;
+  font-size: 0.65rem;
+  background: var(--accent-glow);
+  color: var(--accent);
+  border: 1px solid rgba(56,189,248,0.3);
+  padding: 2px 8px;
+  border-radius: 4px;
+  letter-spacing: 0.05em;
+}
+.cat-badge {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700;
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+.opt-btn {
+  width: 100%;
+  text-align: left;
+  padding: 12px 16px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--surface2);
+  color: var(--text-dim);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+  display: flex; align-items: flex-start; gap: 10px;
+  position: relative;
+}
+.opt-btn:hover { border-color: var(--accent); color: var(--text); background: rgba(56,189,248,0.05); }
+.opt-label {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 20px; height: 20px;
+  border-radius: 4px;
+  background: var(--border2);
+  color: var(--text-dim);
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 700;
+  font-size: 0.65rem;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+.opt-btn.correct {
+  border-color: var(--green);
+  background: var(--green-bg);
+  color: var(--green);
+}
+.opt-btn.correct .opt-label { background: var(--green); color: #0b0e14; }
+.opt-btn.wrong {
+  border-color: var(--rose);
+  background: var(--rose-bg);
+  color: var(--rose);
+}
+.opt-btn.wrong .opt-label { background: var(--rose); color: #0b0e14; }
+.opt-btn:disabled { cursor: not-allowed; }
+.exp-panel {
+  margin-top: 12px;
+  padding: 14px 16px;
+  border-radius: 8px;
+  border-left: 3px solid var(--green);
+  background: var(--green-bg);
+  display: none;
+}
+.exp-panel.show { display: block; }
+.exp-panel-label {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  font-size: 0.65rem;
+  color: var(--green);
+  margin-bottom: 6px;
+  text-transform: uppercase;
+}
+
+/* ── SECTION TITLE ── */
+.section-title {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 800;
+  font-size: 1.1rem;
+  letter-spacing: 0.04em;
+  color: var(--text);
+  display: flex; align-items: center; gap: 10px;
+}
+.section-title::before {
+  content: '';
+  display: inline-block;
+  width: 3px; height: 20px;
+  background: var(--accent);
+  border-radius: 2px;
+}
+
+/* ── FLASHCARD ── */
 .flip-card {
   background-color: transparent;
-  perspective: 1000px;
+  perspective: 1200px;
 }
 .flip-card-inner {
   position: relative;
-  width: 100%;
-  height: 100%;
-  text-align: center;
-  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  width: 100%; height: 100%;
+  transition: transform 0.55s cubic-bezier(0.4, 0, 0.2, 1);
   transform-style: preserve-3d;
 }
-.flip-card.flipped .flip-card-inner {
-  transform: rotateY(180deg);
-}
+.flip-card.flipped .flip-card-inner { transform: rotateY(180deg); }
 .flip-card-front, .flip-card-back {
   position: absolute;
-  width: 100%;
-  height: 100%;
+  width: 100%; height: 100%;
   -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
-  border-radius: 1rem;
+  border-radius: 10px;
 }
-.flip-card-back {
-  transform: rotateY(180deg);
+.flip-card-back { transform: rotateY(180deg); }
+.fc-front {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 18px;
+  display: flex; flex-direction: column; justify-content: space-between;
+  border-radius: 10px;
+  position: relative;
+  overflow: hidden;
 }
-/* 모바일 터치 최적화 스크롤 */
-.no-scrollbar::-webkit-scrollbar {
+.fc-front::after {
+  content: '';
+  position: absolute; bottom: 0; right: 0;
+  width: 80px; height: 80px;
+  background: radial-gradient(circle, rgba(56,189,248,0.07) 0%, transparent 70%);
+  border-radius: 50%;
+}
+.fc-back {
+  background: var(--surface2);
+  border: 1px solid var(--accent);
+  box-shadow: 0 0 20px rgba(56,189,248,0.1);
+  padding: 18px;
+  display: flex; flex-direction: column; justify-content: space-between;
+  border-radius: 10px;
+}
+.fc-amber .fc-front { border-color: rgba(251,191,36,0.3); }
+.fc-amber .fc-back { border-color: var(--amber); box-shadow: 0 0 20px rgba(251,191,36,0.1); }
+
+/* ── SUBJECTIVE ── */
+.sa-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  position: relative;
+}
+.sa-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0;
+  width: 3px; height: 100%;
+  background: linear-gradient(180deg, var(--amber), transparent);
+  border-radius: 12px 0 0 12px;
+  opacity: 0.6;
+}
+.sa-textarea {
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--border2);
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 0.8rem;
+  font-family: 'Noto Sans KR', sans-serif;
+  color: var(--text);
+  outline: none;
+  resize: none;
+  transition: border-color 0.15s;
+}
+.sa-textarea:focus { border-color: var(--amber); }
+.sa-textarea::placeholder { color: var(--text-muted); }
+.btn-check {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  font-size: 0.78rem;
+  background: var(--surface2);
+  color: var(--amber);
+  border: 1px solid var(--amber);
+  border-radius: 6px;
+  padding: 7px 16px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.btn-check:hover { background: var(--amber-bg); }
+.btn-check:disabled { opacity: 0.4; cursor: not-allowed; }
+.model-ans-panel {
+  background: rgba(56,189,248,0.04);
+  border: 1px solid rgba(56,189,248,0.2);
+  border-left: 3px solid var(--accent);
+  border-radius: 8px;
+  padding: 14px;
   display: none;
 }
-.no-scrollbar {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
+.model-ans-panel.show { display: block; }
+
+/* ── SCROLLBAR ── */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--surface); }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+/* ── FOOTER ── */
+.app-footer {
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  padding: 24px 16px;
+  text-align: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  color: var(--text-muted);
 }
+
+/* ── ANIMATIONS ── */
+@keyframes fadeSlideUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.quiz-card, .sa-card { animation: fadeSlideUp 0.3s ease both; }
 </style>
 </head>
 <body class="min-h-screen flex flex-col antialiased">
 
-<!-- ── HEADER (파스텔 블루 & 실버 소프트 테마) ── -->
-<header class="bg-white/80 backdrop-blur-md sticky top-0 z-50 px-3 py-3 border-b border-blue-100/60 shadow-sm">
+<!-- ── HEADER ── -->
+<header class="app-header px-4 py-3">
   <div class="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
-    <div class="flex items-center gap-2.5 w-full sm:w-auto">
-      <span class="text-2xl filter drop-shadow">✈️</span>
+    <div class="flex items-center gap-3 w-full sm:w-auto">
+      <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect width="32" height="32" rx="6" fill="rgba(56,189,248,0.1)" stroke="rgba(56,189,248,0.3)" stroke-width="1"/>
+        <path d="M6 18L14 14L16 10L18 14L26 18" stroke="#38bdf8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="16" cy="10" r="2" fill="#38bdf8"/>
+        <line x1="8" y1="22" x2="24" y2="22" stroke="rgba(56,189,248,0.3)" stroke-width="1" stroke-dasharray="2 2"/>
+      </svg>
       <div class="leading-tight">
-        <h1 class="font-extrabold text-sm tracking-tight text-blue-600">B787 MEMO SYSTEM</h1>
-        <p class="text-[10px] text-slate-400 font-semibold">B787-9 / B787-10 운항메모 종합 평가</p>
+        <h1 class="logo-badge">B787 MEMO SYSTEM</h1>
+        <p style="font-size:0.65rem; color:var(--text-muted); font-family:'JetBrains Mono',monospace; letter-spacing:0.04em;">B787-9 / B787-10 &nbsp;·&nbsp; 운항메모 종합 평가</p>
       </div>
     </div>
     <div class="flex items-center justify-between sm:justify-end gap-2 w-full sm:w-auto">
-      <!-- 텍스트 크기 조절기 -->
-      <div class="flex items-center bg-[#f1f5f9] border border-slate-200 rounded-lg p-0.5">
-        <button onclick="changeFontSize(-1)" class="w-6 h-6 flex items-center justify-center text-xs font-bold text-slate-600 hover:bg-white rounded transition shadow-2xs" title="글자 작게">A-</button>
-        <span id="fontLabel" class="text-[10px] font-mono px-2 text-slate-500 font-bold">14px</span>
-        <button onclick="changeFontSize(1)" class="w-6 h-6 flex items-center justify-center text-xs font-bold text-slate-600 hover:bg-white rounded transition shadow-2xs" title="글자 크게">A+</button>
+      <div class="font-ctrl">
+        <button onclick="changeFontSize(-1)" title="글자 작게">A-</button>
+        <span id="fontLabel">14px</span>
+        <button onclick="changeFontSize(1)" title="글자 크게">A+</button>
       </div>
-      <!-- 랜덤 20문제 실행기 -->
-      <button onclick="startRandomQuiz()" class="bg-blue-500 hover:bg-blue-600 active:scale-95 text-white font-extrabold py-1.5 px-3 rounded-lg text-xs transition shadow-sm flex items-center gap-1">
-        🎲 <span>랜덤 20제</span>
+      <button onclick="startRandomQuiz()" class="btn-random">
+        <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M2 5h9M8 2l3 3-3 3M14 11H5M8 14l-3-3 3-3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        RANDOM 20
       </button>
-      <!-- 상태 칩 -->
-      <div id="statusChip" class="bg-sky-50 border border-sky-100 text-sky-700 rounded-lg py-1 px-2.5 text-xs flex items-center gap-1">
-        <span class="text-sky-500 font-extrabold">풀이</span>
-        <b id="solvedCount" class="text-blue-600 font-mono font-black">0</b>/<span id="totalCount" class="font-mono text-slate-400">0</span>
-        <button onclick="resetSolves()" class="text-slate-400 hover:text-rose-500 font-bold ml-1 transition" title="기록 초기화">↺</button>
+      <div class="status-chip">
+        <span style="color:var(--text-muted)">풀이</span>
+        <b id="solvedCount" style="color:var(--accent)">0</b>
+        <span style="color:var(--text-muted)">/</span>
+        <span id="totalCount" style="color:var(--text-dim)">0</span>
+        <button onclick="resetSolves()" style="color:var(--text-muted);background:none;border:none;cursor:pointer;font-size:0.9rem;padding:0 2px;transition:color 0.15s;" onmouseover="this.style.color='var(--rose)'" onmouseout="this.style.color='var(--text-muted)'" title="기록 초기화">↺</button>
       </div>
     </div>
   </div>
 </header>
 
-<!-- ── NAVIGATION TABS (캡슐형 파스텔 탭) ── -->
-<nav class="bg-white/60 backdrop-blur-sm border-b border-slate-100 sticky top-[57px] sm:top-[53px] z-40 shadow-xs">
-  <div class="max-w-4xl mx-auto flex items-center overflow-x-auto no-scrollbar gap-1 px-3 py-1.5">
-    <button onclick="selectCategory('all')" id="tab-all" class="nav-tab px-3 py-1.5 text-xs font-extrabold rounded-full text-slate-500 hover:bg-slate-100 whitespace-nowrap active transition">전체보기</button>
-    <button onclick="selectCategory('lim')" id="tab-lim" class="nav-tab px-3 py-1.5 text-xs font-extrabold rounded-full text-slate-500 hover:bg-slate-100 whitespace-nowrap transition">Limitation</button>
-    <button onclick="selectCategory('norm')" id="tab-norm" class="nav-tab px-3 py-1.5 text-xs font-extrabold rounded-full text-slate-500 hover:bg-slate-100 whitespace-nowrap transition">Normal &amp; OMB</button>
-    <button onclick="selectCategory('weather')" id="tab-weather" class="nav-tab px-3 py-1.5 text-xs font-extrabold rounded-full text-slate-500 hover:bg-slate-100 whitespace-nowrap transition">Weather &amp; Fuel</button>
-    <button onclick="selectCategory('nonnorm')" id="tab-nonnorm" class="nav-tab px-3 py-1.5 text-xs font-extrabold rounded-full text-slate-500 hover:bg-slate-100 whitespace-nowrap transition">Non-Normal</button>
-    <button onclick="selectCategory('sa')" id="tab-sa" class="nav-tab px-3 py-1.5 text-xs font-extrabold rounded-full text-sky-600 hover:bg-sky-50 whitespace-nowrap transition">✍️ 주관식 평가</button>
-    <button onclick="selectCategory('fc')" id="tab-fc" class="nav-tab px-3 py-1.5 text-xs font-extrabold rounded-full text-emerald-600 hover:bg-emerald-50 whitespace-nowrap transition">⚡ Flashcard</button>
+<!-- ── NAVIGATION TABS ── -->
+<nav class="app-nav" style="top:57px;">
+  <div class="max-w-4xl mx-auto flex items-center overflow-x-auto no-scrollbar gap-1 px-4 py-2">
+    <button onclick="selectCategory('all')" id="tab-all" class="nav-tab">ALL</button>
+    <button onclick="selectCategory('lim')" id="tab-lim" class="nav-tab">Limitation</button>
+    <button onclick="selectCategory('norm')" id="tab-norm" class="nav-tab">Normal &amp; OMB</button>
+    <button onclick="selectCategory('weather')" id="tab-weather" class="nav-tab">Weather &amp; Fuel</button>
+    <button onclick="selectCategory('nonnorm')" id="tab-nonnorm" class="nav-tab">Non-Normal</button>
+    <div style="width:1px;height:18px;background:var(--border2);margin:0 4px;flex-shrink:0;"></div>
+    <button onclick="selectCategory('sa')" id="tab-sa" class="nav-tab" style="color:var(--amber)">✍ 주관식</button>
+    <button onclick="selectCategory('fc')" id="tab-fc" class="nav-tab" style="color:var(--green)">⚡ Flashcard</button>
   </div>
 </nav>
 
 <!-- ── MAIN AREA ── -->
-<main class="flex-1 max-w-4xl w-full mx-auto p-3 md:py-6">
-  <!-- 상단 비주얼 스키매틱 데크 (파스텔톤 축소 적용으로 모바일 스크롤 최소화) -->
+<main class="flex-1 max-w-4xl w-full mx-auto p-4 md:py-6">
+  <!-- 비주얼 다이어그램 덱 -->
   <section class="mb-6 grid grid-cols-1 md:grid-cols-2 gap-3">
-    <!-- 테일 스트라이크 & 고도 마진 다이어그램 -->
-    <div class="bg-white rounded-2xl p-3.5 border border-blue-100/50 shadow-xs flex flex-col justify-between">
-      <div class="flex items-center justify-between mb-1.5">
-        <h3 class="text-xs font-black tracking-tight text-slate-600">PITCH LIMITS &amp; TAIL STRIKE</h3>
-        <span class="text-[9px] bg-rose-50 text-rose-500 px-2 py-0.5 rounded-full font-bold">B787-9 vs B787-10</span>
+    <!-- 테일 스트라이크 & 피치 한계 -->
+    <div class="diagram-card">
+      <div class="flex items-center justify-between mb-3">
+        <h3 style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:0.8rem;letter-spacing:0.06em;color:var(--text);">PITCH LIMITS &amp; TAIL STRIKE</h3>
+        <span style="font-family:'JetBrains Mono',monospace;font-size:0.6rem;color:var(--accent);background:var(--accent-glow);border:1px solid rgba(56,189,248,0.2);padding:2px 8px;border-radius:4px;">B787-9 vs -10</span>
       </div>
-      <!-- SVG 기체 모식도 일러스트레이션 -->
-      <div class="h-24 flex items-center justify-center my-1 bg-[#fbfcfd] rounded-xl overflow-hidden relative border border-slate-100">
-        <svg class="w-full h-full max-w-[260px]" viewBox="0 0 300 120" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <!-- 땅선 -->
-          <line x1="10" y1="95" x2="290" y2="95" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="3 3"/>
-          <!-- 비행기 동체 간략화 라인 (회전축 표시) -->
-          <g transform="translate(130, 80) rotate(-7)">
-            <!-- 기수 가이드 -->
-            <line x1="-100" y1="0" x2="100" y2="0" stroke="#60a5fa" stroke-width="2.5" stroke-linecap="round"/>
-            <circle cx="100" cy="0" r="3.5" fill="#3b82f6"/>
-            <!-- 꼬리날개 -->
-            <line x1="-90" y1="0" x2="-100" y2="-22" stroke="#60a5fa" stroke-width="2.5"/>
-            <!-- 날개 위치 고정 -->
-            <ellipse cx="0" cy="0" rx="12" ry="4" fill="#2563eb"/>
+      <div class="diagram-svg-frame" style="height:100px;display:flex;align-items:center;justify-content:center;position:relative;">
+        <svg style="width:100%;height:100%;max-width:280px;" viewBox="0 0 300 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <line x1="10" y1="80" x2="290" y2="80" stroke="#1e2a3d" stroke-width="1.5" stroke-dasharray="4 4"/>
+          <g transform="translate(130, 70) rotate(-7)">
+            <line x1="-95" y1="0" x2="95" y2="0" stroke="#38bdf8" stroke-width="2" stroke-linecap="round"/>
+            <circle cx="95" cy="0" r="3" fill="#38bdf8"/>
+            <line x1="-85" y1="0" x2="-95" y2="-20" stroke="#38bdf8" stroke-width="2"/>
+            <ellipse cx="0" cy="0" rx="10" ry="3" fill="#0ea5e9"/>
           </g>
-          <!-- 회전점 바퀴 -->
-          <circle cx="130" cy="90" r="4.5" fill="#ffffff" stroke="#94a3b8" stroke-width="1.5"/>
-          <circle cx="142" cy="90" r="4.5" fill="#ffffff" stroke="#94a3b8" stroke-width="1.5"/>
-          <!-- 각도 가이드라인 -->
-          <path d="M130,90 L260,90 M130,90 L250,55" stroke="#f43f5e" stroke-width="1.2" stroke-linecap="round"/>
-          <text x="220" y="85" fill="#f43f5e" class="text-[9px] font-bold">B787-9: 7.8° (9.7°)</text>
-          <text x="190" y="45" fill="#475569" class="text-[9px] font-bold">B787-10: 6.8°</text>
+          <circle cx="130" cy="77" r="4" fill="var(--surface)" stroke="#334155" stroke-width="1.5"/>
+          <circle cx="142" cy="77" r="4" fill="var(--surface)" stroke="#334155" stroke-width="1.5"/>
+          <path d="M130,77 L255,77 M130,77 L240,46" stroke="#fb7185" stroke-width="1" stroke-linecap="round" opacity="0.7"/>
+          <text x="195" y="73" fill="#fb7185" font-size="9" font-family="JetBrains Mono" font-weight="700">B787-9: 7.8&#xb0; (9.7&#xb0;)</text>
+          <text x="168" y="40" fill="#94a3b8" font-size="9" font-family="JetBrains Mono" font-weight="600">B787-10: 6.8&#xb0;</text>
         </svg>
-        <span class="absolute bottom-1.5 left-2 text-[8px] text-slate-400">※ 이착륙 피치 마진 : 단 2.2°</span>
+        <span style="position:absolute;bottom:6px;left:10px;font-size:0.6rem;color:var(--text-muted);font-family:'JetBrains Mono',monospace;">※ 이착륙 피치 마진 : 단 2.2°</span>
       </div>
-      <p class="text-[10px] text-slate-400 mt-1 leading-normal">Liftoff 지시 신호 부재 시 PM은 즉시 <b class="text-rose-400">“PITCH, PITCH”</b> 콜아웃을, PF는 해당 피치를 유지해야 합니다.</p>
+      <p style="font-size:0.7rem;color:var(--text-muted);margin-top:10px;line-height:1.6;">Liftoff 지시 신호 부재 시 PM은 즉시 <b style="color:var(--rose);">"PITCH, PITCH"</b> 콜아웃을, PF는 해당 피치를 유지해야 합니다.</p>
     </div>
 
-    <!-- 180도 선회 포장 폭 다이어그램 -->
-    <div class="bg-white rounded-2xl p-3.5 border border-emerald-100/50 shadow-xs flex flex-col justify-between">
-      <div class="flex items-center justify-between mb-1.5">
-        <h3 class="text-xs font-black tracking-tight text-slate-600 uppercase">180° Turn Pavement Width</h3>
-        <span class="text-[9px] bg-emerald-50 text-emerald-600 px-2 py-0.5 rounded-full font-bold">FCTM 2.10</span>
+    <!-- 180도 선회 포장 폭 -->
+    <div class="diagram-card" style="border-color:rgba(52,211,153,0.2);">
+      <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--green),transparent);opacity:0.7;"></div>
+      <div class="flex items-center justify-between mb-3">
+        <h3 style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:0.8rem;letter-spacing:0.06em;color:var(--text);">180° TURN PAVEMENT WIDTH</h3>
+        <span style="font-family:'JetBrains Mono',monospace;font-size:0.6rem;color:var(--green);background:var(--green-bg);border:1px solid rgba(52,211,153,0.2);padding:2px 8px;border-radius:4px;">FCTM 2.10</span>
       </div>
-      <div class="h-24 flex items-center justify-center my-1 bg-[#fbfcfd] rounded-xl overflow-hidden relative border border-slate-100">
-        <svg class="w-full h-full max-w-[260px]" viewBox="0 0 300 120" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <!-- 선회 외벽 원 가이드 -->
-          <circle cx="150" cy="60" r="45" stroke="#e2e8f0" stroke-width="1" stroke-dasharray="2 2"/>
-          <circle cx="150" cy="60" r="32" stroke="#cbd5e1" stroke-width="1.5"/>
-          <!-- 비행기 머리반경/꼬리반경 가이드 화살표 -->
-          <line x1="150" y1="60" x2="190" y2="38" stroke="#3b82f6" stroke-width="1.5" stroke-linecap="round"/>
-          <text x="175" y="55" fill="#3b82f6" class="text-[8px] font-bold">Tail R</text>
-          <line x1="150" y1="60" x2="115" y2="85" stroke="#10b981" stroke-width="1.5" stroke-linecap="round"/>
-          <text x="102" y="73" fill="#10b981" class="text-[8px] font-bold">Nose R</text>
-          <!-- 중심점 피벗 기어 -->
-          <rect x="148" y="53" width="3" height="14" rx="1" fill="#64748b"/>
+      <div class="diagram-svg-frame" style="height:100px;display:flex;align-items:center;justify-content:center;position:relative;">
+        <svg style="width:100%;height:100%;max-width:280px;" viewBox="0 0 300 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="150" cy="50" r="40" stroke="#1e2a3d" stroke-width="1" stroke-dasharray="3 3"/>
+          <circle cx="150" cy="50" r="28" stroke="#243044" stroke-width="1.5"/>
+          <line x1="150" y1="50" x2="186" y2="30" stroke="#38bdf8" stroke-width="1.5" stroke-linecap="round"/>
+          <text x="170" y="45" fill="#38bdf8" font-size="8" font-family="JetBrains Mono">Tail R</text>
+          <line x1="150" y1="50" x2="118" y2="73" stroke="#34d399" stroke-width="1.5" stroke-linecap="round"/>
+          <text x="96" y="65" fill="#34d399" font-size="8" font-family="JetBrains Mono">Nose R</text>
+          <rect x="148" y="44" width="3" height="12" rx="1" fill="#475569"/>
         </svg>
-        <span class="absolute bottom-1.5 left-2 text-[8px] text-slate-400">※ 창 하단 모서리 = 메인 기어 선착 기준</span>
+        <span style="position:absolute;bottom:6px;left:10px;font-size:0.6rem;color:var(--text-muted);font-family:'JetBrains Mono',monospace;">※ 창 하단 모서리 = 메인 기어 선착 기준</span>
       </div>
-      <div class="text-[10px] text-slate-500 mt-1 space-y-0.5">
-        <div>• <b>B787-9 선회 반경 폭:</b> <span class="text-blue-500 font-bold">154 ft (47.0 m)</span></div>
-        <div>• <b>B787-10 선회 반경 폭:</b> <span class="text-emerald-500 font-bold">176 ft 7 in (53.8 m)</span></div>
+      <div style="font-size:0.7rem;color:var(--text-muted);margin-top:10px;display:flex;flex-direction:column;gap:4px;">
+        <div>· <b style="color:var(--text-dim);">B787-9:</b>&nbsp; <span style="color:var(--accent);font-family:'JetBrains Mono',monospace;font-weight:700;">154 ft (47.0 m)</span></div>
+        <div>· <b style="color:var(--text-dim);">B787-10:</b>&nbsp;<span style="color:var(--green);font-family:'JetBrains Mono',monospace;font-weight:700;">176 ft 7 in (53.8 m)</span></div>
       </div>
     </div>
   </section>
 
-  <!-- 메인 질문 영역 로더 -->
+  <!-- 메인 질문 영역 -->
   <div id="quizContainer" class="space-y-4"></div>
 </main>
-
 <!-- ── FOOTER ── -->
-<footer class="bg-slate-950 text-slate-500 py-6 border-t border-slate-900 mt-auto text-center px-4 text-xs">
-  <div class="max-w-4xl mx-auto space-y-1">
-    <p class="font-semibold text-slate-400">B787 Type Rating Memo Study Deck</p>
-    <p class="text-[10px] text-slate-600">기내표준 신호, 소방 등급, 3% Contingency Fuel, Overweight Landing, Airspeed Unreliable 및 Cold/Hot WX 전 범위 수록</p>
-    <p class="text-[9px] text-slate-700 pt-2">&copy; 2026. B787 Systems Quiz App inside Canvas. All rights reserved.</p>
+<footer class="app-footer mt-auto">
+  <div class="max-w-4xl mx-auto" style="display:flex;flex-direction:column;gap:4px;align-items:center;">
+    <p style="color:var(--text-dim);font-weight:600;letter-spacing:0.04em;">B787 TYPE RATING · MEMO STUDY DECK</p>
+    <p style="color:var(--text-muted);font-size:0.65rem;">기내표준 신호 · 소방 등급 · 3% Contingency Fuel · Overweight Landing · Airspeed Unreliable · Cold/Hot WX</p>
+    <p style="color:var(--border2);font-size:0.6rem;margin-top:4px;">&copy; 2026 B787 Systems Quiz App. All rights reserved.</p>
   </div>
 </footer>
 
@@ -745,25 +1105,25 @@ function changeFontSize(dir) {
 function selectCategory(cat) {
   currentCategory = cat;
   document.querySelectorAll('.nav-tab').forEach(t => {
-    t.classList.remove('bg-slate-950', 'text-white', 'bg-emerald-600', 'text-emerald-50', 'bg-sky-600', 'text-sky-50', 'bg-slate-100');
-    if (t.id === 'tab-fc') {
-      t.classList.add('text-emerald-600');
-    } else if (t.id === 'tab-sa') {
-      t.classList.add('text-sky-600');
-    } else {
-      t.classList.add('text-slate-600');
-    }
+    t.classList.remove('tab-active-mcq', 'tab-active-sa', 'tab-active-fc');
+    // restore default color
+    if (t.id === 'tab-fc') t.style.color = 'var(--green)';
+    else if (t.id === 'tab-sa') t.style.color = 'var(--amber)';
+    else t.style.color = '';
   });
 
   const activeTab = document.getElementById('tab-' + cat);
   if (cat === 'fc') {
-    activeTab.classList.add('bg-emerald-600', 'text-emerald-50');
+    activeTab.classList.add('tab-active-fc');
+    activeTab.style.color = '';
     viewMode = 'fc';
   } else if (cat === 'sa') {
-    activeTab.classList.add('bg-sky-600', 'text-sky-50');
+    activeTab.classList.add('tab-active-sa');
+    activeTab.style.color = '';
     viewMode = 'sa';
   } else {
-    activeTab.classList.add('bg-slate-950', 'text-white');
+    activeTab.classList.add('tab-active-mcq');
+    activeTab.style.color = '';
     viewMode = 'mcq';
   }
   render();
@@ -772,7 +1132,7 @@ function selectCategory(cat) {
 function startRandomQuiz() {
   currentCategory = 'random';
   viewMode = 'mcq';
-  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('bg-slate-950', 'text-white', 'bg-emerald-600', 'text-emerald-50', 'bg-sky-600', 'text-sky-50'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('tab-active-mcq', 'tab-active-sa', 'tab-active-fc'));
   renderRandom();
 }
 
@@ -804,11 +1164,11 @@ function gradeSubjective(id, scoreType) {
   const badgeContainer = document.getElementById(`grade-badge-container-${id}`);
   let badgeHtml = '';
   if (scoreType === 'perfect') {
-    badgeHtml = `<span class="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded-full border border-emerald-200">완벽히 암기함 🌟</span>`;
+    badgeHtml = `<span style="background:var(--green-bg);color:var(--green);border:1px solid rgba(52,211,153,0.3);font-weight:700;padding:3px 10px;border-radius:4px;font-size:0.65rem;">🌟 완벽히 암기함</span>`;
   } else if (scoreType === 'partial') {
-    badgeHtml = `<span class="bg-amber-100 text-amber-800 text-[10px] font-bold px-2 py-0.5 rounded-full border border-amber-200">부분 기억함 👍</span>`;
+    badgeHtml = `<span style="background:var(--amber-bg);color:var(--amber);border:1px solid rgba(251,191,36,0.3);font-weight:700;padding:3px 10px;border-radius:4px;font-size:0.65rem;">👍 부분 기억함</span>`;
   } else {
-    badgeHtml = `<span class="bg-rose-100 text-rose-800 text-[10px] font-bold px-2 py-0.5 rounded-full border border-rose-200">복습 필요 🔁</span>`;
+    badgeHtml = `<span style="background:var(--rose-bg);color:var(--rose);border:1px solid rgba(251,113,133,0.3);font-weight:700;padding:3px 10px;border-radius:4px;font-size:0.65rem;">🔁 복습 필요</span>`;
   }
   badgeContainer.innerHTML = badgeHtml;
 }
@@ -826,25 +1186,23 @@ function render() {
       const cardTheme = isParenthesesCard ? 'from-amber-50 to-amber-100/30' : 'from-emerald-50 to-emerald-100/30';
       const borderTheme = isParenthesesCard ? 'border-amber-200/60' : 'border-emerald-200/60';
       html += `
-        <div class="flip-card h-52 cursor-pointer" id="fc-${idx}" onclick="flipCard(${idx})">
-          <div class="flip-card-inner shadow-xs rounded-2xl border ${borderTheme} bg-white transition-all duration-500 relative h-full">
-            <!-- 앞면 (질문) -->
-            <div class="flip-card-front p-4 flex flex-col justify-between rounded-2xl bg-gradient-to-br ${cardTheme} h-full">
-              <div class="flex items-center justify-between">
-                <span class="text-[9px] font-black tracking-wider text-slate-500 uppercase">${isParenthesesCard ? 'Parentheses Fill ✏️' : 'Flashcard [Oral] 💡'}</span>
-                <span class="text-xs text-slate-400 font-mono font-bold">#${idx + 1}</span>
+        <div class="flip-card" style="height:220px;cursor:pointer;" id="fc-${idx}" onclick="flipCard(${idx})">
+          <div class="flip-card-inner" style="height:100%;">
+            <div class="${isParenthesesCard ? 'fc-front fc-amber' : 'fc-front'}" style="height:100%;">
+              <div style="display:flex;align-items:center;justify-content:space-between;">
+                <span style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:0.65rem;letter-spacing:0.08em;color:${isParenthesesCard ? 'var(--amber)' : 'var(--accent)'};text-transform:uppercase;">${isParenthesesCard ? '✏ 괄호 가리기' : '💡 Flashcard'}</span>
+                <span style="font-family:'JetBrains Mono',monospace;font-size:0.65rem;color:var(--text-muted);">#${idx + 1}</span>
               </div>
-              <div class="text-slate-800 font-extrabold text-center text-xs md:text-sm my-auto px-2 leading-relaxed">${card.q}</div>
-              <div class="text-[9px] text-slate-400 text-center font-bold">탭하여 모범 정답 뒤집기 🔄</div>
+              <div style="font-weight:700;font-size:0.8rem;line-height:1.6;color:var(--text);padding:0 4px;text-align:center;flex:1;display:flex;align-items:center;justify-content:center;">${card.q}</div>
+              <div style="font-family:'JetBrains Mono',monospace;font-size:0.6rem;color:var(--text-muted);text-align:center;">탭하여 정답 확인 🔄</div>
             </div>
-            <!-- 뒷면 (정답) -->
-            <div class="flip-card-back p-4 flex flex-col justify-between rounded-2xl bg-slate-900 text-white h-full">
-              <div class="flex items-center justify-between border-b border-slate-800 pb-1.5">
-                <span class="text-[9px] font-bold text-sky-400 uppercase">Answer Sheet</span>
-                <span class="text-xs text-slate-500 font-mono font-bold">#${idx + 1}</span>
+            <div class="flip-card-back fc-back" style="height:100%;">
+              <div style="display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border2);padding-bottom:8px;">
+                <span style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:0.65rem;letter-spacing:0.08em;color:var(--accent);text-transform:uppercase;">ANSWER</span>
+                <span style="font-family:'JetBrains Mono',monospace;font-size:0.65rem;color:var(--text-muted);">#${idx + 1}</span>
               </div>
-              <div class="text-xs leading-relaxed text-left my-auto text-slate-200 whitespace-pre-line font-medium overflow-y-auto no-scrollbar py-2 max-h-[120px]">${card.ans}</div>
-              <div class="text-[8px] text-sky-400/80 text-center font-extrabold">확인 완료 💡</div>
+              <div style="font-size:0.75rem;line-height:1.7;color:var(--text-dim);white-space:pre-line;font-weight:500;overflow-y:auto;flex:1;padding:6px 0;" class="no-scrollbar">${card.ans}</div>
+              <div style="font-family:'JetBrains Mono',monospace;font-size:0.6rem;color:var(--accent);text-align:center;">확인 완료 ✓</div>
             </div>
           </div>
         </div>
@@ -858,63 +1216,51 @@ function render() {
   // 2. 주관식 평가 렌더링
   if (viewMode === 'sa') {
     let html = `
-      <div class="flex items-center justify-between border-b border-slate-200 pb-3 mb-4">
-        <h2 class="font-black text-slate-800 text-base flex items-center gap-2">
-          <span class="inline-block w-2 h-4 bg-sky-500 rounded-sm"></span>
-          ✍️ 주관식 키워드 매칭 평가 (${SUBJECTIVE_QUIZ_DATA.length}문항)
-        </h2>
-        <span class="text-[10px] bg-slate-100 text-slate-500 px-3 py-1 rounded-full font-bold">AI 키워드 진단</span>
+      <div style="display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:12px;margin-bottom:16px;">
+        <h2 class="section-title">✍ 주관식 평가 <span style="font-family:'JetBrains Mono',monospace;font-size:0.7rem;color:var(--text-muted);font-weight:400;">(${SUBJECTIVE_QUIZ_DATA.length}문항)</span></h2>
+        <span style="font-family:'JetBrains Mono',monospace;font-size:0.6rem;color:var(--amber);background:var(--amber-bg);border:1px solid rgba(251,191,36,0.2);padding:3px 10px;border-radius:4px;">키워드 매칭 진단</span>
       </div>
     `;
 
     SUBJECTIVE_QUIZ_DATA.forEach((q, qidx) => {
       const savedGrade = subSolvedStatus[q.id];
       let statusBadge = '';
-      if (savedGrade === 'perfect') statusBadge = `<span class="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded-full border border-emerald-200">완벽히 암기함 🌟</span>`;
-      else if (savedGrade === 'partial') statusBadge = `<span class="bg-amber-100 text-amber-800 text-[10px] font-bold px-2 py-0.5 rounded-full border border-amber-200">부분 기억함 👍</span>`;
-      else if (savedGrade === 'needs_review') statusBadge = `<span class="bg-rose-100 text-rose-800 text-[10px] font-bold px-2 py-0.5 rounded-full border border-rose-200">복습 필요 🔁</span>`;
+      if (savedGrade === 'perfect') statusBadge = `<span style="background:var(--green-bg);color:var(--green);border:1px solid rgba(52,211,153,0.3);font-weight:700;padding:3px 10px;border-radius:4px;font-size:0.65rem;">🌟 완벽히 암기함</span>`;
+      else if (savedGrade === 'partial') statusBadge = `<span style="background:var(--amber-bg);color:var(--amber);border:1px solid rgba(251,191,36,0.3);font-weight:700;padding:3px 10px;border-radius:4px;font-size:0.65rem;">👍 부분 기억함</span>`;
+      else if (savedGrade === 'needs_review') statusBadge = `<span style="background:var(--rose-bg);color:var(--rose);border:1px solid rgba(251,113,133,0.3);font-weight:700;padding:3px 10px;border-radius:4px;font-size:0.65rem;">🔁 복습 필요</span>`;
 
       html += `
-        <div class="bg-white rounded-xl p-5 border border-slate-200 shadow-sm space-y-4 relative" id="card-${q.id}">
-          <div class="flex items-center justify-between">
-            <div class="flex items-center gap-2">
-              <span class="text-[9px] bg-sky-900 text-sky-100 px-2 py-0.5 rounded-full font-mono font-bold">SA ${qidx + 1}</span>
-              <span class="text-[9px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">${q.cat.toUpperCase()}</span>
+        <div class="sa-card" id="card-${q.id}" style="animation-delay:${qidx * 0.04}s;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+            <div style="display:flex;align-items:center;gap:8px;">
+              <span style="font-family:'JetBrains Mono',monospace;font-weight:700;font-size:0.65rem;background:var(--amber-bg);color:var(--amber);border:1px solid rgba(251,191,36,0.3);padding:2px 8px;border-radius:4px;">SA ${String(qidx+1).padStart(2,'0')}</span>
+              <span style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:0.65rem;letter-spacing:0.1em;color:var(--text-muted);background:var(--surface2);border:1px solid var(--border);padding:2px 8px;border-radius:4px;">${q.cat.toUpperCase()}</span>
             </div>
             <div id="grade-badge-container-${q.id}">${statusBadge}</div>
           </div>
           
-          <!-- 주관식 질문 -->
-          <h4 class="font-extrabold text-slate-800 leading-relaxed q-text">${q.q}</h4>
+          <p style="font-weight:700;line-height:1.7;margin-bottom:14px;color:var(--text);" class="q-text">${q.q}</p>
           
-          <!-- 입력 텍스트 영역 -->
-          <div>
-            <textarea id="user-ans-${q.id}" rows="3" 
-              class="w-full p-3 rounded-lg border border-slate-200 focus:border-sky-500 focus:ring-1 focus:ring-sky-500 text-xs font-semibold text-slate-700 outline-none transition resize-none"
-              placeholder="여기에 생각하신 정답 및 필수 수치/키워드를 자유롭게 작성해 보세요..."></textarea>
-          </div>
+          <textarea id="user-ans-${q.id}" rows="3" class="sa-textarea"
+            placeholder="정답 및 핵심 키워드/수치를 자유롭게 작성하세요..."></textarea>
 
-          <!-- 검증 버튼 -->
-          <div class="flex justify-between items-center gap-2">
-            <button id="btn-check-${q.id}" onclick='checkSubjectiveAnswer("${q.id}", ${JSON.stringify(q.keywords)}, "${q.ans.replace(/"/g, '\\"')}")'
-              class="bg-slate-900 text-white hover:bg-slate-800 font-bold py-1.5 px-4 rounded-lg text-xs transition">
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:10px;">
+            <button id="btn-check-${q.id}" class="btn-check" onclick='checkSubjectiveAnswer("${q.id}", ${JSON.stringify(q.keywords)}, "${q.ans.replace(/"/g, '\\"')}")'>
               🔍 정답 및 키워드 매칭 분석
             </button>
           </div>
 
-          <!-- 스캔된 키워드 & 모범 답안 프레임 -->
-          <div id="match-result-${q.id}" class="space-y-2"></div>
+          <div id="match-result-${q.id}" style="margin-top:8px;"></div>
 
-          <div id="model-ans-${q.id}" class="mt-4 p-4 rounded-xl border-l-4 bg-sky-50 border-sky-500 hidden shadow-inner">
-            <div class="font-black text-[11px] uppercase tracking-wider text-sky-700 mb-1">✓ MODEL REFERENCE MATRIX</div>
-            <p class="font-semibold text-slate-800 text-xs leading-relaxed">${q.ans}</p>
+          <div id="model-ans-${q.id}" class="model-ans-panel" style="margin-top:10px;">
+            <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;letter-spacing:0.08em;font-size:0.65rem;color:var(--accent);margin-bottom:6px;text-transform:uppercase;">✓ MODEL REFERENCE</div>
+            <p style="font-weight:500;line-height:1.6;color:var(--text-dim);font-size:0.8rem;">${q.ans}</p>
             
-            <!-- 자가 채점 선택기 -->
-            <div id="grade-panel-${q.id}" class="mt-3 pt-3 border-t border-sky-200/50 flex flex-wrap items-center gap-2 hidden">
-              <span class="text-[10px] font-bold text-slate-500">자가 진척도 기록:</span>
-              <button onclick="gradeSubjective('${q.id}', 'perfect')" class="bg-white hover:bg-emerald-50 text-emerald-700 border border-slate-200 hover:border-emerald-300 font-bold px-2 py-1 rounded text-[10px] transition">🌟 완벽히 외움</button>
-              <button onclick="gradeSubjective('${q.id}', 'partial')" class="bg-white hover:bg-amber-50 text-amber-700 border border-slate-200 hover:border-amber-300 font-bold px-2 py-1 rounded text-[10px] transition">👍 대략 기억함</button>
-              <button onclick="gradeSubjective('${q.id}', 'needs_review')" class="bg-white hover:bg-rose-50 text-rose-700 border border-slate-200 hover:border-rose-300 font-bold px-2 py-1 rounded text-[10px] transition">🔁 복습 필요</button>
+            <div id="grade-panel-${q.id}" style="margin-top:10px;padding-top:10px;border-top:1px solid rgba(56,189,248,0.15);display:none;flex-wrap:wrap;align-items:center;gap:6px;">
+              <span style="font-family:'JetBrains Mono',monospace;font-size:0.65rem;color:var(--text-muted);">자가 진척도:</span>
+              <button onclick="gradeSubjective('${q.id}', 'perfect')" style="background:var(--green-bg);color:var(--green);border:1px solid rgba(52,211,153,0.3);font-weight:700;padding:4px 10px;border-radius:4px;font-size:0.65rem;cursor:pointer;">🌟 완벽히 외움</button>
+              <button onclick="gradeSubjective('${q.id}', 'partial')" style="background:var(--amber-bg);color:var(--amber);border:1px solid rgba(251,191,36,0.3);font-weight:700;padding:4px 10px;border-radius:4px;font-size:0.65rem;cursor:pointer;">👍 대략 기억함</button>
+              <button onclick="gradeSubjective('${q.id}', 'needs_review')" style="background:var(--rose-bg);color:var(--rose);border:1px solid rgba(251,113,133,0.3);font-weight:700;padding:4px 10px;border-radius:4px;font-size:0.65rem;cursor:pointer;">🔁 복습 필요</button>
             </div>
           </div>
         </div>
@@ -940,49 +1286,40 @@ function renderRandom() {
   const all = [...SYSTEM_QUIZ_DATA.lim, ...SYSTEM_QUIZ_DATA.norm, ...SYSTEM_QUIZ_DATA.weather, ...SYSTEM_QUIZ_DATA.nonnorm];
   const shuffled = all.sort(() => 0.5 - Math.random());
   const selected = shuffled.slice(0, 20);
-  renderQuestionList(selected, "🎲 랜덤 엄선 20제");
+  renderQuestionList(selected, "RANDOM · 엄선 20제");
 }
 
 function renderQuestionList(list, subtitle) {
   const container = document.getElementById('quizContainer');
   let html = `
-    <div class="flex items-center justify-between border-b border-slate-200 pb-3 mb-4">
-      <h2 class="font-black text-slate-800 text-base flex items-center gap-2">
-        <span class="inline-block w-2 h-4 bg-sky-500 rounded-sm"></span>
-        ${subtitle} (${list.length}문항)
-      </h2>
-      <span class="text-[10px] bg-slate-100 text-slate-500 px-3 py-1 rounded-full font-bold">괄호/밑줄/볼드 핵심 매칭</span>
+    <div style="display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:12px;margin-bottom:16px;">
+      <h2 class="section-title">${subtitle} <span style="font-family:'JetBrains Mono',monospace;font-size:0.7rem;color:var(--text-muted);font-weight:400;">(${list.length}문항)</span></h2>
+      <span style="font-family:'JetBrains Mono',monospace;font-size:0.6rem;color:var(--text-muted);background:var(--surface2);border:1px solid var(--border);padding:3px 10px;border-radius:4px;">괄호/밑줄/볼드 핵심 매칭</span>
     </div>
   `;
 
   list.forEach((q, qidx) => {
     const qId = `q-${currentCategory}-${qidx}`;
     html += `
-      <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-xs transition hover:shadow-sm relative overflow-hidden" id="card-${qId}">
-        <div class="flex items-center gap-2 mb-3">
-          <span class="text-[9px] bg-slate-900 text-slate-100 px-2 py-0.5 rounded-full font-mono font-bold">Q${qidx + 1}</span>
-          <span class="text-[9px] bg-sky-100 text-sky-700 px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">Memo Core</span>
+      <div class="quiz-card" id="card-${qId}" style="animation-delay:${qidx * 0.04}s;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+          <span class="q-num-badge">Q${String(qidx + 1).padStart(2,'0')}</span>
+          <span class="cat-badge">MEMO CORE</span>
         </div>
-        
-        <!-- 문제 본문 -->
-        <h4 class="font-extrabold text-slate-800 leading-relaxed mb-4 q-text">${q.q}</h4>
-        
-        <!-- 오지선다 버튼 프레임 -->
-        <div class="space-y-2.5" id="opts-container-${qId}">
+        <p style="font-weight:700;line-height:1.7;margin-bottom:14px;color:var(--text);" class="q-text">${q.q}</p>
+        <div style="display:flex;flex-direction:column;gap:8px;" id="opts-container-${qId}">
           ${q.opts.map((opt, oidx) => `
-            <button onclick="handleAnswer('${qId}', ${oidx}, ${q.ans}, '${q.exp}')" 
-              class="w-full text-left p-3.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 hover:border-slate-300 font-semibold text-slate-700 transition flex items-start gap-3 opt-text relative"
+            <button onclick="handleAnswer('${qId}', ${oidx}, ${q.ans}, '${q.exp}')"
+              class="opt-btn opt-text"
               id="btn-${qId}-${oidx}">
-              <span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-slate-200 text-slate-600 text-[10px] font-black shrink-0 mt-0.5">${String.fromCharCode(65 + oidx)}</span>
-              <span class="flex-1">${opt}</span>
+              <span class="opt-label">${String.fromCharCode(65 + oidx)}</span>
+              <span style="flex:1;">${opt}</span>
             </button>
           `).join('')}
         </div>
-        
-        <!-- 해설 패널 (기본 숨김) -->
-        <div class="mt-4 p-4 rounded-xl border-l-4 bg-emerald-50 border-emerald-500 hidden text-emerald-950 text-xs shadow-inner" id="explanation-${qId}">
-          <div class="font-black text-[11px] uppercase tracking-wider text-emerald-700 mb-1">✓ SYSTEM REFERENCE MATRIX</div>
-          <p class="font-medium leading-relaxed exp-text">${q.exp}</p>
+        <div class="exp-panel" id="explanation-${qId}">
+          <div class="exp-panel-label">✓ SYSTEM REFERENCE</div>
+          <p style="color:var(--green);font-weight:500;line-height:1.6;" class="exp-text">${q.exp}</p>
         </div>
       </div>
     `;
@@ -999,27 +1336,18 @@ function handleAnswer(qId, selectedIdx, correctIdx, explanation) {
   const explanationPanel = document.getElementById(`explanation-${qId}`);
 
   if (selectedIdx === correctIdx) {
-    selectedBtn.classList.remove('bg-slate-50', 'hover:bg-slate-100');
-    selectedBtn.classList.add('bg-emerald-500', 'text-white', 'border-emerald-600');
-    selectedBtn.querySelector('span').classList.add('bg-emerald-600', 'text-emerald-50');
-    selectedBtn.innerHTML += `<span class="absolute right-4 top-1/2 -translate-y-1/2 font-black text-white text-sm">✓</span>`;
-    
+    selectedBtn.classList.add('correct');
+    selectedBtn.innerHTML += `<span style="position:absolute;right:14px;top:50%;transform:translateY(-50%);font-weight:900;font-size:1rem;">✓</span>`;
     container.classList.add('solved');
-    explanationPanel.classList.remove('hidden');
-    
-    for (let i = 0; i < 4; i++) {
-      if (i !== selectedIdx) {
-        document.getElementById(`btn-${qId}-${i}`).disabled = true;
-        document.getElementById(`btn-${qId}-${i}`).classList.add('opacity-40');
-      }
-    }
-    
+    explanationPanel.classList.add('show');
+    const allBtns = container.querySelectorAll('.opt-btn');
+    allBtns.forEach((btn, i) => {
+      if (i !== selectedIdx) { btn.disabled = true; btn.style.opacity = '0.3'; }
+    });
     markSolved(qId);
   } else {
-    selectedBtn.classList.remove('bg-slate-50', 'hover:bg-slate-100');
-    selectedBtn.classList.add('bg-rose-500', 'text-white', 'border-rose-600');
-    selectedBtn.querySelector('span').classList.add('bg-rose-600', 'text-rose-50');
-    selectedBtn.innerHTML += `<span class="absolute right-4 top-1/2 -translate-y-1/2 font-black text-white text-sm">✗</span>`;
+    selectedBtn.classList.add('wrong');
+    selectedBtn.innerHTML += `<span style="position:absolute;right:14px;top:50%;transform:translateY(-50%);font-weight:900;font-size:1rem;">✗</span>`;
     selectedBtn.disabled = true;
   }
 }
@@ -1030,10 +1358,10 @@ function checkSubjectiveAnswer(id, correctKeywords, correctAnsText) {
   const modelAnsContainer = document.getElementById(`model-ans-${id}`);
   const btn = document.getElementById(`btn-check-${id}`);
   
-  modelAnsContainer.classList.remove('hidden');
+  modelAnsContainer.classList.add('show');
   
-  let matchHtml = `<div class="mt-3 flex flex-wrap gap-2 items-center">
-    <span class="text-[10px] font-bold text-slate-500 uppercase">키워드 매치 상태:</span>`;
+  let matchHtml = `<div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:6px;align-items:center;">
+    <span style="font-family:'JetBrains Mono',monospace;font-size:0.6rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.06em;">키워드 매치:</span>`;
   
   let matchedCount = 0;
   correctKeywords.forEach(kw => {
@@ -1043,22 +1371,22 @@ function checkSubjectiveAnswer(id, correctKeywords, correctAnsText) {
     
     if (isMatched) {
       matchedCount++;
-      matchHtml += `<span class="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded-md border border-emerald-200">✓ ${kw}</span>`;
+      matchHtml += `<span style="background:var(--green-bg);color:var(--green);border:1px solid rgba(52,211,153,0.3);font-weight:700;padding:2px 8px;border-radius:4px;font-size:0.65rem;font-family:'JetBrains Mono',monospace;">✓ ${kw}</span>`;
     } else {
-      matchHtml += `<span class="bg-slate-100 text-slate-400 text-[10px] font-bold px-2 py-0.5 rounded-md border border-slate-200 line-through">✗ ${kw}</span>`;
+      matchHtml += `<span style="background:var(--surface2);color:var(--text-muted);border:1px solid var(--border);font-weight:700;padding:2px 8px;border-radius:4px;font-size:0.65rem;font-family:'JetBrains Mono',monospace;text-decoration:line-through;">✗ ${kw}</span>`;
     }
   });
   matchHtml += `</div>`;
   
   const matchRate = Math.round((matchedCount / correctKeywords.length) * 100);
   matchResultContainer.innerHTML = `
-    <div class="mt-2 text-xs font-black text-slate-700">
-      분석 매칭율: <span class="${matchRate >= 50 ? 'text-emerald-600' : 'text-amber-600'}">${matchRate}%</span> (${matchedCount}/${correctKeywords.length}개 핵심 데이터 구체화 완료)
+    <div style="font-family:'JetBrains Mono',monospace;font-size:0.7rem;font-weight:700;color:var(--text-dim);margin-bottom:4px;">
+      매칭율: <span style="color:${matchRate >= 50 ? 'var(--green)' : 'var(--amber)'};">${matchRate}%</span> <span style="color:var(--text-muted);font-weight:400;">(${matchedCount}/${correctKeywords.length}개 확인)</span>
     </div>
     ${matchHtml}
   `;
   
-  document.getElementById(`grade-panel-${id}`).classList.remove('hidden');
+  document.getElementById(`grade-panel-${id}`).style.display = 'flex';
   btn.disabled = true;
   btn.classList.add('opacity-50');
   
