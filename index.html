@@ -3,1628 +3,839 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>B787 Systems & Memo Comprehensive Quiz</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
-<!-- Tailwind CSS CDN -->
+<title>천기누설 : 사주와 로또의 만남</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;700;900&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+<script>
+    tailwind.config = {
+        theme: {
+            extend: {
+                colors: {
+                    primary: '#FAF7F2',
+                    secondary: '#A1B5D0',
+                    accent: '#D4A373',
+                    soft: '#3A302E',
+                    pastelGreen: '#CCD5AE',
+                    pastelRose: '#E8A598',
+                },
+                fontFamily: {
+                    serif: ['"Noto Serif KR"', 'serif'],
+                    sans: ['"Noto Sans KR"', 'sans-serif'],
+                },
+                animation: {
+                    'float-slow': 'float 6s ease-in-out infinite',
+                },
+                keyframes: {
+                    float: {
+                        '0%, 100%': { transform: 'translateY(0px)' },
+                        '50%': { transform: 'translateY(-8px)' },
+                    },
+                    slot: {
+                        '0%': { transform: 'translateY(-4px)', opacity: 0.6 },
+                        '100%': { transform: 'translateY(4px)', opacity: 0.9 },
+                    }
+                }
+            }
+        }
+    }
+</script>
 <style>
-:root {
-  --quiz-font-size: 14px;
-}
-body {
-  font-family: 'Inter', 'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif;
-  background-color: #f4f7fc;
-  color: #2c3e50;
-  -webkit-tap-highlight-color: transparent;
-}
-.q-text {
-  font-size: var(--quiz-font-size);
-}
-.opt-text {
-  font-size: calc(var(--quiz-font-size) - 1px);
-}
-.exp-text {
-  font-size: calc(var(--quiz-font-size) - 2px);
-}
-/* 모바일 터치 최적화 스크롤 */
-.no-scrollbar::-webkit-scrollbar {
-  display: none;
-}
-.no-scrollbar {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
-/* 플립 카드 애니메이션 (Flashcard 전용) */
-.flip-card {
-  background-color: transparent;
-  perspective: 1000px;
-}
-.flip-card-inner {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  text-align: center;
-  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-  transform-style: preserve-3d;
-}
-.flip-card.flipped .flip-card-inner {
-  transform: rotateY(180deg);
-}
-.flip-card-front, .flip-card-back {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  -webkit-backface-visibility: hidden;
-  backface-visibility: hidden;
-  border-radius: 1.25rem;
-}
-.flip-card-front {
-  transform: rotateY(0deg);
-}
-.flip-card-back {
-  transform: rotateY(180deg);
-}
+    * { -webkit-tap-highlight-color: transparent; scroll-behavior: smooth; }
+    body {
+        background-color: #FAF7F2;
+        color: #3A302E;
+        background-image:
+            radial-gradient(circle at 50% 0%, rgba(224, 204, 190, 0.35) 0%, transparent 60%),
+            url('https://www.transparenttextures.com/patterns/papyrous.png');
+        word-break: keep-all;
+        /* background-attachment: fixed 속성은 모바일 스크롤 성능 저하의 주범이므로 제거 */
+    }
+    .glass-card {
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        border: 1px solid rgba(212, 163, 115, 0.3);
+        box-shadow: 0 4px 20px rgba(58, 48, 46, 0.05);
+        transform: translateZ(0); /* GPU 가속 활성화 */
+    }
+    .chart-box { position: relative; width: 100%; height: 260px; margin: 0 auto; }
+    .lotto-ball {
+        display: flex; align-items: center; justify-content: center;
+        position: relative;
+        width: 2.45rem; height: 2.45rem; border-radius: 50%;
+        background: radial-gradient(circle, #faedd8 0%, #d4a373 70%, #a27244 100%);
+        color: #3A302E;
+        font-family: 'Noto Serif KR', serif;
+        font-weight: 900;
+        font-size: 1rem;
+        box-shadow: 0 3px 8px rgba(90, 69, 21, 0.15), inset 0 1px 2px rgba(255, 255, 255, 0.8);
+        border: 1.5px solid #b28254;
+        transition: transform 0.2s ease; /* 전환 시간 단축 */
+        flex-shrink: 0;
+        transform: translateZ(0); /* 하드웨어 가속 */
+        will-change: transform;
+    }
+    @media (min-width: 640px) {
+        .lotto-ball {
+            width: 3.2rem;
+            height: 3.2rem;
+            font-size: 1.25rem;
+            border-width: 2px;
+        }
+    }
+    .lotto-ball::before {
+        content: '';
+        position: absolute;
+        top: 2px; left: 2px; right: 2px; bottom: 2px;
+        background: radial-gradient(circle, #ffffff 0%, #faf8f5 70%, #f4ebd9 100%);
+        border-radius: 50%;
+        border: 1px dashed rgba(178, 130, 84, 0.5);
+        z-index: 1;
+    }
+    @media (min-width: 640px) {
+        .lotto-ball::before { top: 3px; left: 3px; right: 3px; bottom: 3px; }
+    }
+    .lotto-ball::after {
+        content: '';
+        position: absolute;
+        top: -1px; left: -1px; right: -1px; bottom: -1px;
+        border-radius: 50%;
+        border: 2.2px dotted #fff5e6;
+        opacity: 0.85;
+        z-index: 2;
+        pointer-events: none;
+    }
+    .lotto-ball span {
+        position: relative;
+        z-index: 3;
+        font-family: 'Noto Serif KR', serif;
+        font-weight: 900;
+        color: #2f2523;
+        text-shadow: 1px 1px 0px rgba(255, 255, 255, 0.9);
+    }
+    .lotto-ball.rolling {
+        animation: slot 0.12s linear infinite;
+        background: radial-gradient(circle, #f0e6df 0%, #cfb8aa 100%);
+        border-color: #a89487;
+    }
+    .input-field {
+        background: rgba(255, 255, 255, 0.65);
+        border: 1px solid rgba(212, 163, 115, 0.4);
+        color: #3A302E;
+        font-size: 16px !important;
+        transition: all 0.2s ease;
+    }
+    .input-field:focus {
+        border-color: #D4A373;
+        background: rgba(255, 255, 255, 0.95);
+        box-shadow: 0 0 0 3px rgba(212, 163, 115, 0.15);
+        outline: none;
+    }
+    .select-wrapper { position: relative; }
+    .select-wrapper::after {
+        content: '▼';
+        position: absolute;
+        right: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #D4A373;
+        font-size: 0.7rem;
+        pointer-events: none;
+    }
+    select option { background-color: #FAF7F2; color: #3A302E; padding: 10px; }
 </style>
 </head>
-<body class="min-h-screen flex flex-col antialiased">
+<body class="font-sans antialiased min-h-screen relative overflow-x-hidden">
+<div class="max-w-4xl mx-auto px-5 py-8 md:py-16 relative z-10">
+    <header class="text-center mb-10 animate-float-slow">
+        <p class="text-accent font-serif tracking-[0.2em] text-xs mb-2 font-bold">✧ 천 기 누 설 ✧</p>
+        <h1 class="text-3xl md:text-5xl font-serif font-black text-soft mb-4 tracking-tight">사주와 로또의 만남</h1>
+        <p class="text-soft/80 font-light text-sm md:text-lg leading-relaxed px-2">
+            다가오는 <strong id="headerSaturday" class="text-accent underline underline-offset-4 font-bold">토요일</strong>의 최적 번호를 도출합니다.
+        </p>
+    </header>
 
-<header class="bg-white/90 backdrop-blur-md sticky top-0 z-50 px-3 py-3 border-b border-blue-100/60 shadow-xs">
-  <div class="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
-    <div class="flex items-center gap-2.5 w-full sm:w-auto">
-      <div class="leading-tight">
-        <h1 class="font-extrabold text-sm tracking-tight text-blue-600">B787 SYSTEM MASTER MEMO</h1>
-        <p class="text-[10px] text-slate-400 font-bold">FCOM/FCTM 핵심 지침 분석 및 종합 자동 평가</p>
-      </div>
+    <section id="inputPortal" class="glass-card rounded-2xl p-6 md:p-10 transition-all duration-500">
+        <div class="mb-8 p-4 rounded-xl bg-accent/5 border border-accent/20 text-center">
+            <p class="text-accent text-sm font-bold mb-1">⚠️ 주간 단 한 번의 천기누설</p>
+            <p class="text-soft/80 text-xs leading-relaxed">
+                본 서비스는 귀하의 평생 사주 원국과 <span class="text-accent font-bold">매주 달라지는 토요일의 운세 흐름</span>을 결합합니다.<br>
+                매주 토요일마다 분석 결과와 행운 번호가 새롭게 갱신되오니 정성껏 확인해 주십시오.
+            </p>
+        </div>
+        <div class="text-center mb-6">
+            <h2 class="text-xl font-serif font-bold text-accent mb-1">운명의 정보 입력</h2>
+            <p class="text-soft/60 text-xs font-light">태어난 시각과 정보를 정확히 조율할수록 하늘의 맥박과 더 일치합니다.</p>
+        </div>
+        <form id="destinyForm" class="space-y-5">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-[11px] font-bold text-accent/80 mb-1.5 uppercase tracking-wider">성함 (선택)</label>
+                    <input type="text" id="inputName" class="input-field w-full px-4 py-3.5 rounded-xl placeholder-soft/30" placeholder="미입력시 '익명'으로 분석">
+                </div>
+                <div>
+                    <label class="block text-[11px] font-bold text-accent/80 mb-1.5 uppercase tracking-wider">성별</label>
+                    <div class="flex gap-3">
+                        <label class="flex-1 flex items-center justify-center gap-2 cursor-pointer input-field py-3.5 rounded-xl"><input type="radio" name="gender" value="M" checked class="accent-accent"> <span class="text-sm font-medium">남성</span></label>
+                        <label class="flex-1 flex items-center justify-center gap-2 cursor-pointer input-field py-3.5 rounded-xl"><input type="radio" name="gender" value="F" class="accent-accent"> <span class="text-sm font-medium">여성</span></label>
+                    </div>
+                </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-[11px] font-bold text-accent/80 mb-1.5 uppercase tracking-wider">양력/음력</label>
+                    <div class="flex gap-2">
+                        <label class="flex-1 flex items-center justify-center gap-1 cursor-pointer input-field py-3.5 rounded-xl text-xs"><input type="radio" name="calendar" value="S" checked class="accent-accent"> 양력</label>
+                        <label class="flex-1 flex items-center justify-center gap-1 cursor-pointer input-field py-3.5 rounded-xl text-xs"><input type="radio" name="calendar" value="L" class="accent-accent"> 음력</label>
+                        <label class="flex-1 flex items-center justify-center gap-1 cursor-pointer input-field py-3.5 rounded-xl text-xs"><input type="radio" name="calendar" value="LI" class="accent-accent"> 음력(윤달)</label>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-[11px] font-bold text-accent/80 mb-1.5 uppercase tracking-wider">태어난 지역 (시차 보정)</label>
+                    <div class="select-wrapper">
+                        <select id="inputCity" class="input-field w-full px-4 py-3.5 rounded-xl appearance-none cursor-pointer font-medium text-sm">
+                            <option value="127.02">서울/인천/경기</option>
+                            <option value="129.07">부산/울산/경남</option>
+                            <option value="128.60">대구/경북</option>
+                            <option value="126.85">광주/전라</option>
+                            <option value="127.38">대전/세종/충청</option>
+                            <option value="127.73">강원</option>
+                            <option value="126.53">제주</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-[11px] font-bold text-accent/80 mb-1.5 uppercase tracking-wider">생년월일 (8자리)</label>
+                    <input type="text" id="inputBirth" required maxlength="10" inputmode="numeric" class="input-field w-full px-4 py-3.5 rounded-xl placeholder-soft/30" placeholder="예: 19950512">
+                </div>
+                <div>
+                    <label class="block text-[11px] font-bold text-accent/80 mb-1.5 uppercase tracking-wider">태어난 시 (시간)</label>
+                    <div class="select-wrapper">
+                        <select id="inputTime" class="input-field w-full px-4 py-3.5 rounded-xl appearance-none cursor-pointer font-medium">
+                            <option value="unknown">태어난 시간 모름</option>
+                            <option value="0">자시 (23시~01시)</option>
+                            <option value="1">축시 (01시~03시)</option>
+                            <option value="2">인시 (03시~05시)</option>
+                            <option value="3">묘시 (05시~07시)</option>
+                            <option value="4">진시 (07시~09시)</option>
+                            <option value="5">사시 (09시~11시)</option>
+                            <option value="6">오시 (11시~13시)</option>
+                            <option value="7">미시 (13시~15시)</option>
+                            <option value="8">신시 (15시~17시)</option>
+                            <option value="9">유시 (17시~19시)</option>
+                            <option value="10">술시 (19시~21시)</option>
+                            <option value="11">해시 (21시~23시)</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <button type="submit" id="submitBtn" class="w-full mt-4 bg-gradient-to-br from-accent to-[#c3915f] text-white font-bold text-lg py-4 rounded-xl active:scale-[0.98] transition-all shadow-md shadow-accent/20">분석 및 번호 생성 ☯</button>
+        </form>
+    </section>
+
+    <div id="loadingState" class="hidden text-center py-16 flex-col items-center justify-center">
+        <div class="text-5xl text-accent animate-spin mb-6" style="animation-duration: 3s;">☯</div>
+        <h3 class="text-xl font-serif text-soft mb-2 font-bold">주간 운명의 흐름을 튜닝하는 중...</h3>
+        <p id="loadingText" class="text-xs text-soft/60">다가오는 토요일의 우주 전파를 동기화하고 있습니다.</p>
+        <div class="max-w-[200px] w-full mx-auto h-[3px] bg-soft/10 rounded-full mt-6 overflow-hidden">
+            <div id="progressBar" class="h-full bg-accent transition-all duration-100 ease-linear" style="width: 0%"></div>
+        </div>
     </div>
-    <div class="flex items-center justify-between sm:justify-end gap-2 w-full sm:w-auto">
-      <!-- 상태 칩 -->
-      <div id="statusChip" class="bg-sky-50 border border-sky-100 text-sky-700 rounded-lg py-1 px-2.5 text-xs flex items-center gap-1">
-        <span class="text-sky-500 font-extrabold">풀이</span>
-        <b id="solvedCount" class="text-blue-600 font-mono font-black">0</b>/<span id="totalCount" class="font-mono text-slate-400">0</span>
-        <button onclick="resetSolves()" class="text-slate-400 hover:text-rose-500 font-bold ml-1 transition" title="기록 초기화">↺</button>
-      </div>
-      <!-- 랜덤 20문제 실행기 -->
-      <button onclick="startRandomQuiz()" class="bg-blue-500 hover:bg-blue-600 active:scale-95 text-white font-bold py-1.5 px-3 rounded-lg text-xs transition shadow-sm flex items-center gap-1">
-        <span>랜덤 20제</span>
-      </button>
-      <!-- 텍스트 크기 조절기 -->
-      <div class="flex items-center bg-[#f1f5f9] border border-slate-200 rounded-lg p-0.5 shrink-0">
-        <button onclick="changeFontSize(-1)" class="w-6 h-6 flex items-center justify-center text-xs font-bold text-slate-600 hover:bg-white rounded transition shadow-2xs" title="글자 작게">A-</button>
-        <span id="fontLabel" class="hidden">14px</span>
-        <span class="text-xs font-bold px-2 text-slate-400 select-none">A</span>
-        <button onclick="changeFontSize(1)" class="w-6 h-6 flex items-center justify-center text-xs font-bold text-slate-600 hover:bg-white rounded transition shadow-2xs" title="글자 크게">A+</button>
-      </div>
-    </div>
-  </div>
-</header>
 
-<nav class="bg-white border-b border-slate-100 sticky top-[57px] sm:top-[53px] z-40 shadow-xs">
-  <div class="max-w-4xl mx-auto flex items-center overflow-x-auto no-scrollbar gap-1.5 px-3 py-2">
-    <span class="text-[11px] font-black text-slate-400 shrink-0 mr-1 select-none">카테고리</span>
-    <button onclick="setCategory('all')" id="cat-all" class="cat-tab px-3 py-1.5 text-xs font-extrabold rounded-full text-white bg-blue-600 shadow-sm whitespace-nowrap transition">전체보기</button>
-    <button onclick="setCategory('lim')" id="cat-lim" class="cat-tab px-3 py-1.5 text-xs font-extrabold rounded-full text-slate-500 hover:bg-slate-100 whitespace-nowrap transition">Limitation</button>
-    <button onclick="setCategory('norm')" id="cat-norm" class="cat-tab px-3 py-1.5 text-xs font-extrabold rounded-full text-slate-500 hover:bg-slate-100 whitespace-nowrap transition">Normal &amp; OMB</button>
-    <button onclick="setCategory('weather')" id="cat-weather" class="cat-tab px-3 py-1.5 text-xs font-extrabold rounded-full text-slate-500 hover:bg-slate-100 whitespace-nowrap transition">Weather &amp; Fuel</button>
-    <button onclick="setCategory('nonnorm')" id="cat-nonnorm" class="cat-tab px-3 py-1.5 text-xs font-extrabold rounded-full text-slate-500 hover:bg-slate-100 whitespace-nowrap transition">Non-Normal</button>
-    
-    <!-- 소프트 파스텔 세로 구분선 -->
-    <span class="h-4 w-px bg-slate-200 mx-1 shrink-0"></span>
+    <main id="dashboard" class="hidden opacity-0 transition-opacity duration-1000 space-y-6">
+        <div class="text-center py-4 border-b border-accent/15">
+            <h2 class="text-2xl font-serif font-bold text-soft"><span id="displayUser" class="text-accent"></span>님의 행운 보고서</h2>
+            <p class="text-xs text-soft/60 mt-1 uppercase tracking-widest font-bold"><span id="saturdayDate" class="text-accent"></span> 행운 분석 결과</p>
+        </div>
 
-    <span class="text-[11px] font-black text-slate-400 shrink-0 mr-1 select-none">학습모드</span>
-    <button onclick="setMode('mcq')" id="mode-mcq" class="mode-tab px-3 py-1 text-xs font-extrabold rounded-full text-white bg-blue-600 border border-blue-600 shadow-sm whitespace-nowrap transition">객관식 평가</button>
-    <button onclick="setMode('sa')" id="mode-sa" class="mode-tab px-3 py-1 text-xs font-extrabold rounded-full text-slate-500 hover:bg-slate-100 whitespace-nowrap transition">주관식 평가</button>
-    <button onclick="setMode('fc')" id="mode-fc" class="mode-tab px-3 py-1 text-xs font-extrabold rounded-full text-slate-500 hover:bg-slate-100 whitespace-nowrap transition">Flashcard</button>
-  </div>
-</nav>
+        <section class="glass-card rounded-2xl p-4 md:p-6 text-center">
+            <h3 class="text-lg font-serif font-bold text-accent mb-1">✨ 토요일 행운의 조합 (5대 세트)</h3>
+            <p id="lottoStatusText" class="text-[11px] text-soft/50 mb-6 italic">우주 주파수 융합 중...</p>
+            <div class="space-y-4 text-center">
+                <div class="p-4 rounded-xl bg-[#FAF1E6] border border-[#E9D5C3]/60 shadow-sm transition-all hover:shadow-md">
+                    <p class="text-[10px] text-accent/80 font-bold mb-3 tracking-widest uppercase text-center">조합 A : 주말 기운 보완형 (기운 조화)</p>
+                    <div id="numberContainer1" class="flex flex-nowrap justify-center items-center gap-1.5 md:gap-3 overflow-x-hidden"></div>
+                </div>
+                <div class="p-4 rounded-xl bg-[#F0F4EE] border border-[#D5E0D0]/60 shadow-sm transition-all hover:shadow-md">
+                    <p class="text-[10px] text-[#7A8F75] font-bold mb-3 tracking-widest uppercase text-center">조합 B : 주말 기운 집중형 (목적 성취)</p>
+                    <div id="numberContainer2" class="flex flex-nowrap justify-center items-center gap-1.5 md:gap-3 overflow-x-hidden"></div>
+                </div>
+                <div class="p-4 rounded-xl bg-[#EEF2F7] border border-[#D3DFED]/60 shadow-sm transition-all hover:shadow-md">
+                    <p class="text-[10px] text-[#627D9F] font-bold mb-3 tracking-widest uppercase text-center">조합 C : 우주 기류 동조형 (순수 행운)</p>
+                    <div id="numberContainer3" class="flex flex-nowrap justify-center items-center gap-1.5 md:gap-3 overflow-x-hidden"></div>
+                </div>
+                <div class="p-4 rounded-xl bg-[#FAF0F2] border border-[#ECD1D5]/60 shadow-sm transition-all hover:shadow-md">
+                    <p class="text-[10px] text-[#A66F77] font-bold mb-3 tracking-widest uppercase text-center">조합 D : 천지 순항 조율형 (안정 정합)</p>
+                    <div id="numberContainer4" class="flex flex-nowrap justify-center items-center gap-1.5 md:gap-3 overflow-x-hidden"></div>
+                </div>
+                <div class="p-4 rounded-xl bg-[#F6F5F0] border border-[#E1DEC9]/60 shadow-sm transition-all hover:shadow-md">
+                    <p class="text-[10px] text-[#858063] font-bold mb-3 tracking-widest uppercase text-center">조합 E : 길성 수호 집중형 (천을수호)</p>
+                    <div id="numberContainer5" class="flex flex-nowrap justify-center items-center gap-1.5 md:gap-3 overflow-x-hidden"></div>
+                </div>
+            </div>
+        </section>
 
-<!-- ── MAIN AREA ── -->
-<main class="flex-1 max-w-4xl w-full mx-auto p-3 md:py-6">
-  <section id="visualSchematics" class="mb-6 grid grid-cols-1 md:grid-cols-2 gap-3">
-    <!-- 테일 스트라이크 & 고도 마진 다이어그램 -->
-    <div class="bg-white rounded-2xl p-3.5 border border-blue-100/50 shadow-xs flex flex-col justify-between">
-      <div class="flex items-center justify-between mb-1.5">
-        <h3 class="text-xs font-black tracking-tight text-slate-600">PITCH LIMITS &amp; TAIL STRIKE</h3>
-        <span class="text-[9px] bg-rose-50 text-rose-500 px-2 py-0.5 rounded-full font-bold">B787-9 vs B787-10</span>
-      </div>
-      <div class="h-24 flex items-center justify-center my-1 bg-[#fbfcfd] rounded-xl overflow-hidden relative border border-slate-100">
-        <svg class="w-full h-full max-w-[260px]" viewBox="0 0 300 120" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <line x1="10" y1="95" x2="290" y2="95" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="3 3"/>
-          <g transform="translate(130, 80) rotate(-7)">
-            <line x1="-100" y1="0" x2="100" y2="0" stroke="#60a5fa" stroke-width="2.5" stroke-linecap="round"/>
-            <circle cx="100" cy="0" r="3.5" fill="#3b82f6"/>
-            <line x1="-90" y1="0" x2="-100" y2="-22" stroke="#60a5fa" stroke-width="2.5"/>
-            <ellipse cx="0" cy="0" rx="12" ry="4" fill="#2563eb"/>
-          </g>
-          <circle cx="130" cy="90" r="4.5" fill="#ffffff" stroke="#94a3b8" stroke-width="1.5"/>
-          <circle cx="142" cy="90" r="4.5" fill="#ffffff" stroke="#94a3b8" stroke-width="1.5"/>
-          <path d="M130,90 L260,90 M130,90 L250,55" stroke="#f43f5e" stroke-width="1.2" stroke-linecap="round"/>
-          <text x="220" y="85" fill="#f43f5e" font-size="9" font-weight="bold" font-family="Inter, sans-serif">B787-9: 7.8° (9.7°)</text>
-          <text x="190" y="45" fill="#475569" font-size="9" font-weight="bold" font-family="Inter, sans-serif">B787-10: 6.8°</text>
-        </svg>
-        <span class="absolute bottom-1.5 left-2 text-[8px] text-slate-400">이착륙 피치 마진 : 단 2.2°</span>
-      </div>
-      <p class="text-[10px] text-slate-400 mt-1 leading-normal">Liftoff 지시 부재 시 PM은 즉시 <b class="text-rose-400">“PITCH, PITCH”</b> 콜아웃을 하고, PF는 해당 피치를 유지해야 합니다.</p>
-    </div>
+        <section class="glass-card rounded-2xl p-6 md:p-8">
+            <div class="text-center mb-6">
+                <h3 class="text-md font-serif font-bold text-accent uppercase tracking-widest mb-1">☯ 사주 명식 & 오행 분포</h3>
+                <p class="text-soft/60 text-[10px]">입력하신 생년월일시와 토요일 일진의 하모니</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch">
+                <div class="bg-white/40 p-5 rounded-xl border border-accent/20 flex flex-col justify-between shadow-inner">
+                    <p class="text-accent text-[10px] font-bold text-center uppercase tracking-wider mb-4">운명 명식 분석 (四柱)</p>
+                    <div class="grid grid-cols-4 gap-1 text-center font-serif">
+                        <div class="border-r border-accent/10 last:border-0">
+                            <span class="text-soft/60 text-[10px] block mb-2">년주</span>
+                            <span id="saju-year-hanja" class="text-2xl md:text-3xl font-bold text-soft block tracking-wider leading-relaxed">?</span>
+                            <span id="saju-year-hangul" class="text-[11px] text-accent font-bold mt-2 block">?</span>
+                        </div>
+                        <div class="border-r border-accent/10 last:border-0">
+                            <span class="text-soft/60 text-[10px] block mb-2">월주</span>
+                            <span id="saju-month-hanja" class="text-2xl md:text-3xl font-bold text-soft block tracking-wider leading-relaxed">?</span>
+                            <span id="saju-month-hangul" class="text-[11px] text-accent font-bold mt-2 block">?</span>
+                        </div>
+                        <div class="border-r border-accent/10 last:border-0">
+                            <span class="text-soft/60 text-[10px] block mb-2">일주</span>
+                            <span id="saju-day-hanja" class="text-2xl md:text-3xl font-bold text-soft block tracking-wider leading-relaxed">?</span>
+                            <span id="saju-day-hangul" class="text-[11px] text-accent font-bold mt-2 block">?</span>
+                        </div>
+                        <div>
+                            <span class="text-soft/60 text-[10px] block mb-2">시주</span>
+                            <span id="saju-hour-hanja" class="text-2xl md:text-3xl font-bold text-soft block tracking-wider leading-relaxed">?</span>
+                            <span id="saju-hour-hangul" class="text-[11px] text-accent font-bold mt-2 block">?</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white/40 p-5 rounded-xl border border-accent/20 flex flex-col justify-between shadow-inner">
+                    <p class="text-accent text-[10px] font-bold text-center uppercase tracking-wider mb-4">기류 오행 에너지 (五행)</p>
+                    <div class="flex justify-around items-center py-2">
+                        <div class="text-center">
+                            <div class="w-9 h-9 rounded-full bg-[#6B8E23] text-white flex items-center justify-center font-bold text-sm mx-auto shadow-sm border border-white/40">木</div>
+                            <span id="dist-wood" class="text-sm font-bold text-soft block mt-2">0</span>
+                        </div>
+                        <div class="text-center">
+                            <div class="w-9 h-9 rounded-full bg-[#E07A5F] text-white flex items-center justify-center font-bold text-sm mx-auto shadow-sm border border-white/40">火</div>
+                            <span id="dist-fire" class="text-sm font-bold text-soft block mt-2">0</span>
+                        </div>
+                        <div class="text-center">
+                            <div class="w-9 h-9 rounded-full bg-[#D4A373] text-white flex items-center justify-center font-bold text-sm mx-auto shadow-sm border border-white/40">土</div>
+                            <span id="dist-earth" class="text-sm font-bold text-soft block mt-2">0</span>
+                        </div>
+                        <div class="text-center">
+                            <div class="w-9 h-9 rounded-full bg-[#A8A29E] text-white flex items-center justify-center font-bold text-sm mx-auto shadow-sm border border-white/40">金</div>
+                            <span id="dist-metal" class="text-sm font-bold text-soft block mt-2">0</span>
+                        </div>
+                        <div class="text-center">
+                            <div class="w-9 h-9 rounded-full bg-[#8CA4D8] text-white flex items-center justify-center font-bold text-sm mx-auto shadow-sm border border-white/40">水</div>
+                            <span id="dist-water" class="text-sm font-bold text-soft block mt-2">0</span>
+                        </div>
+                    </div>
+                    <p class="text-[10px] text-soft/60 text-center mt-3">※ 사주 원국과 금주 일진의 상호 보완 비율</p>
+                </div>
+            </div>
+        </section>
 
-    <!-- 180도 선회 포장 폭 다이어그램 -->
-    <div class="bg-white rounded-2xl p-3.5 border border-emerald-100/50 shadow-xs flex flex-col justify-between">
-      <div class="flex items-center justify-between mb-1.5">
-        <h3 class="text-xs font-black tracking-tight text-slate-600 uppercase">180° Turn Pavement Width</h3>
-        <span class="text-[9px] bg-emerald-50 text-emerald-600 px-2 py-0.5 rounded-full font-bold">FCTM 2.10</span>
-      </div>
-      <div class="h-24 flex items-center justify-center my-1 bg-[#fbfcfd] rounded-xl overflow-hidden relative border border-slate-100">
-        <svg class="w-full h-full max-w-[260px]" viewBox="0 0 300 120" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <circle cx="150" cy="60" r="45" stroke="#e2e8f0" stroke-width="1" stroke-dasharray="2 2"/>
-          <circle cx="150" cy="60" r="32" stroke="#cbd5e1" stroke-width="1.5"/>
-          <line x1="150" y1="60" x2="190" y2="38" stroke="#3b82f6" stroke-width="1.5" stroke-linecap="round"/>
-          <text x="175" y="55" fill="#3b82f6" font-size="8" font-weight="bold" font-family="Inter, sans-serif">Tail R</text>
-          <line x1="150" y1="60" x2="115" y2="85" stroke="#10b981" stroke-width="1.5" stroke-linecap="round"/>
-          <text x="102" y="73" fill="#10b981" font-size="8" font-weight="bold" font-family="Inter, sans-serif">Nose R</text>
-          <rect x="148" y="53" width="3" height="14" rx="1" fill="#64748b"/>
-        </svg>
-        <span class="absolute bottom-1.5 left-2 text-[8px] text-slate-400">창 하단 모서리 = 메인 기어 지시 기준</span>
-      </div>
-      <div class="text-[10px] text-slate-500 mt-1 space-y-0.5">
-        <div>• <b>B787-9 선회 반경 폭:</b> <span class="text-blue-500 font-bold">154 ft (47.0 m)</span></div>
-        <div>• <b>B787-10 선회 반경 폭:</b> <span class="text-emerald-500 font-bold">176 ft 7 in (53.8 m)</span></div>
-      </div>
-    </div>
-  </section>
-
-  <!-- 메인 질문 영역 로더 -->
-  <div id="quizContainer" class="space-y-4"></div>
-</main>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <section class="glass-card rounded-2xl p-6">
+                <h3 class="text-md font-serif font-bold text-accent mb-4 text-center">📊 금주 오행 기운 하모니도</h3>
+                <div class="chart-box"><canvas id="sajuRadarChart"></canvas></div>
+            </section>
+            <section class="glass-card rounded-2xl p-6">
+                <h3 class="text-md font-serif font-bold text-accent mb-6 flex items-center justify-center gap-2">
+                    📖 <span class="targetSaturday"></span> 토요일 운세 기류 해설
+                </h3>
+                <div class="space-y-4" id="insightContainer">
+                    <div class="insight-card p-4 rounded-xl bg-white/50 border border-accent/10 shadow-sm">
+                        <h4 class="text-accent text-xs font-bold mb-2 flex items-center gap-2">
+                            <span class="w-5 h-5 flex items-center justify-center bg-accent/20 rounded-full text-[9px]">🌟</span> 타고난 천성 및 다가오는 토요일의 기류
+                        </h4>
+                        <div id="insight-total" class="text-soft/90 leading-relaxed text-[13px] text-justify space-y-2"></div>
+                    </div>
+                    <div class="insight-card p-4 rounded-xl bg-white/50 border border-accent/10 shadow-sm">
+                        <h4 class="text-accent text-xs font-bold mb-2 flex items-center gap-2">
+                            <span class="w-5 h-5 flex items-center justify-center bg-accent/20 rounded-full text-[9px]">💰</span> 주말 재물운 및 최적의 구매 타이밍
+                        </h4>
+                        <div id="insight-wealth" class="text-soft/90 leading-relaxed text-[13px] text-justify space-y-2"></div>
+                    </div>
+                    <div class="insight-card p-4 rounded-xl bg-white/50 border border-accent/10 shadow-sm">
+                        <h4 class="text-accent text-xs font-bold mb-2 flex items-center gap-2">
+                            <span class="w-5 h-5 flex items-center justify-center bg-accent/20 rounded-full text-[9px]">🍀</span> 기운을 부르는 일상 행동 가이드
+                        </h4>
+                        <div id="insight-health" class="text-soft/90 leading-relaxed text-[13px] text-justify space-y-2"></div>
+                    </div>
+                </div>
+            </section>
+        </div>
+        <div class="text-center pt-8 pb-4">
+            <button onclick="resetInterface()" class="px-8 py-3 rounded-full border border-accent/40 text-accent font-medium text-sm hover:bg-accent/10 active:scale-95 transition-all">← 다시 분석하기</button>
+        </div>
+    </main>
+</div>
 
 <script>
-const SYSTEM_QUIZ_DATA = {
-  "sa": [], // JS Dynamic Map
-  "lim": [
-    {
-      id: "mcq-lim-1",
-      q: "All Call 운항 중 운항 승무원과 객실 승무원 간의 '기내 표준 비상 신호'로 규정된 조합으로 올바른 것은 무엇입니까? (S.2.2.2)",
-      opts: [
-        "운항에서 객실: “5, 5” / 객실에서 운항: “*, *”",
-        "운항에서 객실: “*, *” / 객실에서 운항: “5, 5”",
-        "운항에서 객실: “9, 9” / 객실에서 운항: “#, #”",
-        "운항에서 객실: “2, 2” / 객실에서 운항: “0, 0”"
-      ],
-      ans: 0,
-      exp: "운항 승무원에서 객실 승무원으로 전송하는 비상 호출 표준은 “5, 5” 이며, 반대로 객실에서 운항으로 전달하는 신호는 “*, *” 입니다."
-    },
-    {
-      id: "mcq-lim-2",
-      q: "당사 규정(FOM 5.13.2) 기준, B787 항공기의 '구조 및 소방 등급' 분류로 옳은 것은 무엇입니까?",
-      opts: [
-        "ICAO 8 등급 / FAA D 등급",
-        "ICAO 9 등급 / FAA E 등급",
-        "ICAO 10 등급 / FAA E 등급",
-        "ICAO 7 등급 / FAA C 등급"
-      ],
-      ans: 1,
-      exp: "B787은 A350, A330-300, B777, B747-400 기종과 함께 ICAO 9 등급 및 FAA E 등급에 해당합니다."
-    },
-    {
-      id: "mcq-lim-3",
-      q: "ICAO Aerodrome Reference Code 및 Wingspan에 따른 등급 분류(Note) 지침 중 괄호와 볼드로 표기된 올바른 규정은 무엇입니까?",
-      opts: [
-        "Wingspan과 Outer Main Gear Wheel Span 등급이 다를 경우, 낮은 등급을 적용한다.",
-        "Wingspan과 Outer Main Gear Wheel Span 등급이 다를 경우, 높은 등급을 적용한다.",
-        "기수바퀴(Nose Gear) 거리에 기초하여 항상 ICAO 4E 고정 등급을 부여한다.",
-        "FAA Airplane Design Group (ADG)에 따르며 Wingspan 등급만 단독 고려한다."
-      ],
-      ans: 1,
-      exp: "Note에 명시된 대로, Wingspan과 Outer Main Gear Wheel Span 등급이 상이할 경우 '높은 등급(E)'을 보수적으로 적용합니다."
-    },
-    {
-      id: "mcq-lim-4",
-      q: "기체 180도 선회(Turns of 180 Degrees)를 위한 '최소 포장 도로 폭(Min pavement width)' 한계 수치로 올바른 것은 무엇입니까?",
-      opts: [
-        "B787-9 : 140 ft (42.7m) / B787-10 : 165 ft (50.3m)",
-        "B787-9 : 154 ft (47.0 m) / B787-10 : 176 ft 7 inches (53.8 m)",
-        "B787-9 : 165 ft (50.3m) / B787-10 : 197 ft 3 inches (60.1m)",
-        "B787-9 : 154 ft (47.0 m) / B787-10 : 154 ft (47.0 m)"
-      ],
-      ans: 1,
-      exp: "B787-9의 최소 도로 폭은 154 ft (47.0 m)이며, B787-10의 최소 도로 폭은 176 ft 7 inches (53.8 m) 입니다."
-    },
-    {
-      id: "mcq-lim-5",
-      q: "B787-9 및 B787-10의 최대 기압 고도 운영 한계(Maximum Operating Altitude)로 각각 올바른 것은 무엇입니까?",
-      opts: [
-        "B787-9 : 43,100 ft / B787-10 : 41,100 ft",
-        "B787-9 : 41,100 ft / B787-10 : 43,100 ft",
-        "B787-9 : 45,100 ft / B787-10 : 43,100 ft",
-        "B787-9 : 43,000 ft / B787-10 : 41,000 ft"
-      ],
-      ans: 0,
-      exp: "B787-9의 한계는 43,100 ft pressure altitude 이고, B787-10의 한계는 41,100 ft pressure altitude 입니다."
-    },
-    {
-      q: "자동 비행 최저 연결 고도(minimum engage altitude) 및 비계기/시계 접근 시의 오토파일럿 해제 기준 수치는 각각 어떻게 됩니까?",
-      id: "mcq-lim-6",
-      opts: [
-        "이륙 후 400 ft AGL 이상 연결 / 접근 시 1,000 ft HAA/HAT 이전 해제",
-        "이륙 후 200 ft AGL 이상 연결 / 접근 시 500 ft HAA/HAT 이전 해제",
-        "이륙 후 100 ft AGL 이상 연결 / 접근 시 200 ft HAA/HAT 이전 해제",
-        "이륙 후 200 ft AGL 이상 연결 / 접근 시 100 ft HAA/HAT 이전 해제"
-      ],
-      ans: 1,
-      exp: "이륙 후 최소 자동 조종 연결 고도는 200 ft AGL 이며, Circling/Visual approach 시 오토파일럿 해제 한계는 500 ft HAA/HAT 이전입니다."
-    },
-    {
-      id: "mcq-lim-7",
-      q: "LAND 2 또는 LAND 3 자동 착륙 표시등(Annunciation)이 없는 상태에서 접근 비행 시, Autopilot 해제 수치는 기종별로 각각 어떻게 정의됩니까?",
-      opts: [
-        "B787-9 : 100 ft AGL / B787-10 : 135 ft AGL",
-        "B787-9 : 135 ft AGL / B787-10 : 100 ft AGL",
-        "B787-9 : 135 ft AGL / B787-10 : 135 ft AGL",
-        "B787-9 : 200 ft AGL / B787-10 : 100 ft AGL"
-      ],
-      ans: 1,
-      exp: "LAND 2/3 표시가 없는 경우 Autopilot 해제 고도는 B787-9의 경우 135 ft AGL 이며, B787-10의 경우 100 ft AGL 입니다."
-    },
-    {
-      id: "mcq-lim-8",
-      q: "심한 난기류 조우 시 B787 시스템 매뉴얼에 명시된 '난기류 관통 속도(Turbulent air penetration speed)' 기준 수치로 올바른 것은 무엇입니까?",
-      opts: [
-        "25,000 ft 미만: 290 KIAS / 25,000 ft 이상: 310 KIAS 또는 .84 Mach 중 높은 값",
-        "25,000 ft 미만: 290 KIAS / 25,000 ft 이상: 310 KIAS 또는 .84 Mach 중 낮은 값",
-        "25,000 ft 미만: 270 KIAS / 25,000 ft 이상: 290 KIAS 또는 .82 Mach 중 낮은 값",
-        "고도 상관없이 공통 속도로 310 KIAS 또는 .84 Mach 고정 적용"
-      ],
-      ans: 1,
-      exp: "관통 속도는 25,000 ft 미만에서 290 KIAS 이고, 25,000 ft 이상 영역에서는 310 KIAS 또는 .84 Mach 중 낮은 값(whichever is lower) 입니다."
-    },
-    {
-      id: "mcq-lim-9",
-      q: "LAND 2 또는 LAND 3 자동 비행 조건 상태에서 글라이드패스(Glidepath) 각도가 3.25°를 초과할 때, Autopilot 해제 고도는 얼마로 제한됩니까?",
-      opts: [
-        "200 ft AGL 이하",
-        "150 ft AGL 이하",
-        "100 ft AGL 이하",
-        "50 ft AGL 이하"
-      ],
-      ans: 2,
-      exp: "LAND 2 또는 LAND 3 상태에서 글라이드패스 각도가 3.25°를 초과하는 정밀 접근 시, 최저 오토파일럿 해제 고도는 100 ft AGL입니다."
-    },
-    {
-      id: "mcq-lim-10",
-      q: "비계기 정밀 접근 단계가 아닐 때, 계기 비행 시 고도 하강 속도를 제어하는 FLCH(Flight Level Change) 모드의 사용이 제한 및 금지되는 시점은 언제입니까?",
-      opts: [
-        "FAF(최종진입지점) 이전 고공 대기 단계",
-        "FAF(최종진입지점) 통과 이후 또는 시계 접근 시 1,500 ft HAT/HAA 이하",
-        "이륙 가속 단계 중 2,000 ft AGL 도달 이전",
-        "순항 고도 변경을 위한 Step Climb 수행 전 단계"
-      ],
-      ans: 1,
-      exp: "FLCH 모드는 최종진입지점(FAF) 이후 또는 시계 비행 접근 시 1,500 ft HAT/HAA 이하 조건에서 사용이 철저히 금지됩니다."
-    }
-  ],
-  "norm": [
-    {
-      id: "mcq-norm-1",
-      q: "ANOMALOUS TAT PROBE LOGIC (운항 뷸레틴 KAL-6R1)에 의해 공중에서 Anti-ice 시스템을 수동 작동(Manual Operation)해야 하는 기온 조건과 그 하강 연기(Delay) 고도 기준으로 올바른 것은 무엇입니까?",
-      opts: [
-        "TAT가 10°C 이하이면서 육안 수분이 있을 때 가동 / 필요 시 1,000 ft AGL까지 연기 가능",
-        "TAT가 15°C 이하 10°C 초과이고 육안 수분이 있을 때 가동 / 필요 시 1,500~2,500 ft AGL까지 가동 연기 가능",
-        "TAT가 25°C 이하이면서 결빙이 감지되었을 때만 가동 / 필요 시 3,000 ft AGL까지 연기 가능",
-        "OAT가 10°C 이하이면서 눈이나 슬러시가 감지될 때 즉시 가동 / 연기 불가"
-      ],
-      ans: 1,
-      exp: "Anomalous TAT probe logic 상 TAT가 15°C 이하이고 10°C 초과인 영역에서도 육안 수분이 존재하면 Anti-ice가 켜져야 하며, 이륙 성능 충족을 위해 이 작동을 1,500 ft AGL까지, 늦어도 2,500 ft AGL까지는 연기할 수 있습니다."
-    },
-    {
-      id: "mcq-norm-2",
-      q: "VMC 저고도 접근 중 통합 접근 항법(IAN)의 오경보로 인해 'GLIDESLOPE' 음성 경고가 울릴 경우, 경고음을 끄기(Silence) 위한 유일하게 가용한 조치 스위치는 무엇입니까? (KAL-43R1)",
-      opts: [
-        "주 조종석 정면의 오디오 컨트롤 패널(ACP) 'AURAL CANCEL' 스위치 조작",
-        "오버헤드 중앙 패널 트랜스폰더 좌측에 장착된 'BELOW G/S (G/S INHIBIT)' 스위치 조작",
-        "글래스 콕핏 하부의 'FMC RUNWAY DISAGREE' 전원 차단 스위치 조작",
-        "오토파일럿 끊기(Disconnect) 스위치를 연속으로 2회 푸시"
-      ],
-      ans: 1,
-      exp: "KAL-43R1에 명시된 바와 같이, 글라이드슬롭 음성 경고를 끄려면 'Aural Cancel' 버튼이 아닌 'G/S INHIBIT (BELOW G/S)' 스위치를 눌러야 정상 차단됩니다."
-    },
-    {
-      id: "mcq-norm-3",
-      q: "이륙 중 비정상 메시지 경보 방지를 위한 이륙 플랩 세팅(NADP2) 시 'THR REDUCTION(Thrust Reduction Point)' 고도값 설정 기준 수치는 어떻게 됩니까? (KAL-44)",
-      opts: [
-        "이륙 플랩 설정이 FLAPS 5보다 큰(greater) 경우, 고도를 1,500 ft로 세팅한다.",
-        "이륙 플랩 설정이 FLAPS 15 이하인 경우, 고도를 1,000 ft로 세팅한다.",
-        "이륙 플랩 설정이 FLAPS 5보다 작은 경우, 고도를 3,000 ft로 세팅한다.",
-        "이륙 플랩과 무관하게 항상 고정값인 3,000 ft로 통일한다."
-      ],
-      ans: 0,
-      exp: "Climb thrust 조기 차단 오류를 예방하기 위해, takeoff flap 설정이 FLAPS 5보다 큰 경우 THR REDUCTION 포인트를 1,500 ft로 세팅해야 합니다."
-    },
-    {
-      id: "mcq-norm-4",
-      q: "이륙 택시 라인업(LINE-UP) 진행 중 원치 않는 'FMC RWY DISAGREE' 메시지 오작동을 예방하기 위해 조종사가 초과하지 말아야 하는 최대 N1 추력 수치(maximum thrust)는 얼마입니까?",
-      opts: [
-        "40% N1",
-        "45% N1",
-        "58% N1",
-        "60% N1"
-      ],
-      ans: 2,
-      exp: "FMC RWY DISAGREE 메시지가 불필요하게 트리거되는 것을 방지하기 위해, 이륙 라인업 중 엔진 테스트나 가속 시 58% N1을 초과하지 않도록 권장됩니다."
-    },
-    {
-      id: "mcq-norm-5",
-      q: "B787의 에어 시스템(Air Conditioning System) 기능 중 지상에서 Cabin Occupant 수치를 설정할 때, CAC Surge 예방을 위한 기종별 표준 인원 설정값(Cabin occupants)은 각각 몇 명입니까?",
-      opts: [
-        "B787-8/-9 : 250명 / B787-10 : 300명",
-        "B787-8/-9 : 318명 / B787-10 : 337명",
-        "B787-8/-9 : 337명 / B787-10 : 318명",
-        "기종 공통으로 최대 승객 한계인 350명으로 설정"
-      ],
-      ans: 1,
-      exp: "에어컨 불충분 기류로 인한 CAC 서지 방지를 위해, Cabin Occupants 세팅값을 B787-8/-9의 경우 318명, B787-10의 경우 337명으로 세팅하도록 절차화되어 있습니다."
-    },
-    {
-      id: "mcq-norm-6",
-      q: "정전 및 조업 이동 시 사용하는 'Towing Power mode' 상태일 때 전원이 공급되지 않는(not energized) 시스템은 무엇입니까?",
-      opts: [
-        "조종실 보조 항법 시스템 (Flight Instruments)",
-        "무선 통신 시스템 (Radio communication systems)",
-        "브레이크 압력 시스템 (Brake Pressurization)",
-        "주 기내 조명 시스템 (Dome/Cabin Lights)"
-      ],
-      ans: 1,
-      exp: "Towing Power 모드에서는 Radio communication system(무선 통신 시스템)에 전원이 들어오지 않으므로 교신이 불가능합니다."
-    },
-    {
-      id: "mcq-norm-7",
-      q: "B787-9 및 B787-10의 비상시 조종사 가용 산소 압력(Flight Crew Oxygen) 제한 수치로 각각 올바른 것은 무엇입니까?",
-      opts: [
-        "B787-9 : 800 psi / B787-10 : 800 psi",
-        "B787-9 : 862 psi / B787-10 : 844 psi",
-        "B787-9 : 844 psi / B787-10 : 862 psi",
-        "B787-9 : 1,000 psi / B787-10 : 1,000 psi"
-      ],
-      ans: 1,
-      exp: "수치 한계 기준에 의거하여, 최저 산소 압력 기준은 B787-9의 경우 862 psi 이며, B787-10의 경우 844 psi 입니다."
-    },
-    {
-      id: "mcq-norm-8",
-      q: "FCAC 지상 가동 시 고온 환경(Hot day conditions)에서 FWD CARGO FLOW Selector의 모드 선택에 따른 운용 우선순위 차이에 대한 설명으로 올바른 것은 무엇입니까? (HL8515 - HL8574 등)",
-      opts: [
-        "HIGH flow 모드는 Cargo Ventilation을 우선하고, LOW flow 모드는 Cabin Cooling을 우선한다.",
-        "HIGH flow 모드는 Cabin Cooling을 우선하고, LOW flow 모드는 Cargo Ventilation을 우선한다.",
-        "HIGH/LOW 모드에 관계없이 항상 Cabin Cooling만 최우선 공급된다.",
-        "BULK cargo 선택기가 AUTO일 때는 오직 LOW flow만 가용하다."
-      ],
-      ans: 0,
-      exp: "지침에 의거, 고온 조건의 FCAC 지상 가동 시 HIGH flow 모드는 Cargo Ventilation(화물실 환기)을 우선하고, LOW flow 모드는 Cabin Cooling(객실 냉방)을 우선하도록 설계되어 있습니다."
-    },
-    {
-      id: "mcq-norm-9",
-      q: "APU가 불능인 상태에서 전방 외부 전원(Forward External Power)만으로 엔진 시동을 수행할 때 요구되는 전원 스펙 및 우측 엔진 먼저 시동 시 지원받을 수 있는 전기 시스템 결합에 대한 설명으로 올바른 것은 무엇입니까?",
-      opts: [
-        "최소 90 kVA 전방 외부 전원 1개가 필요하며, 좌측 엔진을 먼저 시동할 때만 후방 외부 전원의 보조가 가능하다.",
-        "최소 90 kVA rated 전방 외부 전원 2개가 필요하며, 우측 엔진을 먼저 시동할 경우 후방 외부 전원(Aft External Power)의 도움을 받을 수 있다.",
-        "최소 120 kVA 전방 외부 전원 2개 필요하며, 엔진 시동 순서는 항상 고정되어 변경할 수 없다.",
-        "외부 전원으로 시동 시 반드시 APU 발전기 스위치가 ON 상태로 연동되어 있어야 부하 차단이 방지된다."
-      ],
-      ans: 1,
-      exp: "APU 없이 시동 시 최소 90 kVA 전방 외부 전원 2개가 필요하며, 우측 엔진을 먼저 시동하는 경우 후방 외부 전원 시스템이 전방 시스템을 지원할 수 있습니다."
-    },
-    {
-      id: "mcq-norm-10",
-      q: "운항 매뉴얼에 명시된 FMC Runway Disagree Caution 메시지가 유발하는 조종사의 지상 이륙 기동 판단 기준은 무엇입니까?",
-      opts: [
-        "이륙 추진력을 Full TO/GA 출력으로 상향 후 이륙을 급히 계속 진행한다.",
-        "FMC 활주로 정보 오차가 확인되면 즉각 이륙 거부(RTO)를 개시한다.",
-        "EICAS 상의 경보 무시 명령을 확인하고 활주로 오정렬 무시 수동 조작을 가한다.",
-        "오토파일럿의 LNAV 무효 가이드 상태를 유지하며 500 ft AGL까지 수동 이륙한다."
-      ],
-      ans: 1,
-      exp: "이륙 기동 중 FMC Runway Disagree 메시지가 출력되면 안전을 위해 이륙 거부(RTO)를 즉각 개시하는 것이 의무 규정입니다."
-    }
-  ],
-  "weather": [
-    {
-      id: "mcq-weather-1",
-      q: "Live Animal과 동일 화물실(Compartment)에 절대 혼합 탑재해서는 안 되는 특수 화물이자 추천 최대 중량 제한(Max Dry Ice Load)을 받는 위험물 코드는 무엇입니까?",
-      opts: [
-        "Dry Ice (Code PER(perishable))",
-        "Lithium Batteries (Code RLI/RLM)",
-        "Clinial Specimens (Code UN3373)",
-        "Consumer Commodity (Code ID8000)"
-      ],
-      ans: 0,
-      exp: "Dry Ice(코드 PER, 드라이아이스)는 이산화탄소 방출로 인해 살아있는 동물(Live Animal)과 동일 Compartment 탑재가 엄격히 제한됩니다."
-    },
-    {
-      id: "mcq-weather-2",
-      q: "비행 중 또는 지상에서 연료 밸런스 자동 제어(Fuel Balance System)가 불가능하도록 시스템 억제(Inhibited) 처리되는 조건이 아닌 것은 무엇입니까?",
-      opts: [
-        "지상에서 어느 한 엔진이라도 시동되어 가동 중인 경우 (on the ground and one or both engines are running)",
-        "중앙 연료 탱크 펌프가 켜져 있는 경우 (a center tank pump is on)",
-        "목적지 상공에서 고도 강하를 개시하여 DESCENT 모드가 활성화된 경우",
-        "연료 방출 시스템이 활성화되었거나 FUEL DISAGREE 메시지가 표시된 경우"
-      ],
-      ans: 2,
-      exp: "단순히 Descent 모드로 진입한 것은 연료 밸런스 억제 조건이 아닙니다. 지상 엔진 가동, Center tank 펌프 ON, Jettison 시스템 활성화, FUEL DISAGREE, FUEL QTY LOW 상태 등에서 밸런싱이 가제 차단됩니다."
-    },
-    {
-      id: "mcq-weather-3",
-      q: "영하 기온 상태에서 지상 조업 시 안티아이스 시스템 지상 작동 억제 로직과 관련하여, 자동 결빙 감지(Automatic ice detection)와 윙 방빙(Wing anti-ice)이 차단(Inhibited)되는 지상 속도는 얼마입니까?",
-      opts: [
-        "50 knots 미만",
-        "75 knots 미만",
-        "80 knots 미만",
-        "100 knots 미만"
-      ],
-      ans: 1,
-      exp: "지상에서는 75 knots 미만일 때 자동 결빙 감지 및 윙 방빙 기능의 작동이 억제(Inhibited)됩니다."
-    },
-    {
-      id: "mcq-weather-4",
-      q: "지상 OAT 3°C 이하의 결빙 조건(Icing Condition)에서 착륙 후 지상 택시(Taxi-in) 중, 제방빙 run-up 점검을 수행하지 못하고 램프인(Ramp-in) 했을 때 정비 일지(Flight Maintenance Log) 기록 규정은 무엇입니까?",
-      opts: [
-        "조치 불필요, 단순 이월 처리한다.",
-        "“Taxiing in icing condition for 00 min”으로 Logging을 실시한다.",
-        "“Flaps and slats operated in icing conditions”로 단순 Logging만 한다.",
-        "정비사 구두 통보로 대체하고 일지 기록은 생략한다."
-      ],
-      ans: 1,
-      exp: "Landing 후 3°C 이하 Icing 상태에서 지상 엔진 런업 점검 없이 기수를 파킹한 경우, 누적 방빙 노출 상태 정비를 위해 “Taxiing in icing condition for 00 min” 기록을 명시해야 합니다."
-    },
-    {
-      id: "mcq-weather-5",
-      q: "외기 온도 극저온(at or below -17°C) 상황 하에서 지상 정차 시, 전기 유압 펌프 선택기(selectors)가 AUTO 또는 OFF 위치로 몇 분 이상 지속될 때 정비사 통보 조치가 필요한가요?",
-      opts: [
-        "5분 이상",
-        "10분 이상",
-        "15분 이상",
-        "20분 이상"
-      ],
-      ans: 1,
-      exp: "-17°C 이하 극저온에서 전기식 유압 펌프가 가동되지 않고 10분 이상 방치된 상태에서 엔진 구동 펌프를 켜면 cavitation 등에 의한 시스템 손상 위험이 있어 정비사에 즉시 알려야 합니다."
-    },
-    {
-      id: "mcq-weather-6",
-      q: "3% Contingency Fuel 비상 연료 운영 계획 시, 비행 대비 목적지 도착 지연 및 고도 변경 통보 기준으로 옳은 수치 조합은 무엇입니까?",
-      opts: [
-        "도착 지연 10분 초과 / 고도 변경 2,000 ft 초과 시 통보",
-        "도착 지연 15분 초과 / 고도 변경 4,000 ft 초과 시 통보",
-        "도착 지연 30분 초과 / 고도 변경 6,000 ft 초과 시 통보",
-        "도착 지연 20분 초과 / 고도 변경 5,000 ft 초과 시 통보"
-      ],
-      ans: 1,
-      exp: "공식 지침에 따르면 비행 계획 대비 도착 시간이 15분을 초과해 지연되거나 고도 상승/하강 폭이 4,000 ft를 초과할 시 지상 통보 의무가 발생합니다."
-    },
-    {
-      id: "mcq-weather-7",
-      q: "Jettison 연료 수동 방출 절차 완료 후에도 기체 안전 마진을 지키기 위해 메인 탱크(Main Tank)에 남도록 보존 설계된 최저 잔여 연료량은 각각 얼마입니까?",
-      opts: [
-        "각 메인 탱크에 6,000 lbs",
-        "각 메인 탱크에 8,700 lbs",
-        "각 메인 탱크에 10,000 lbs",
-        "각 메인 탱크에 12,000 lbs"
-      ],
-      ans: 1,
-      exp: "연료 방출(Jettison) 시스템이 정지 한계에 다다랐을 때 기기 보호 및 최종 예비 확보를 위해 메인 탱크에 무조건 8,700 lbs가 자동 보존됩니다."
-    },
-    {
-      id: "mcq-weather-8",
-      q: "이륙 전 연료 주입(Fueling) 절차 상, 외부 영하 온도 기후에서 연료 주유를 개시할 때 반드시 지켜져야 하는 이륙 전 최소 연료 가온 온도는 몇 도 이상이어야 합니까?",
-      opts: [
-        "-15°C 이상",
-        "-20°C 이상",
-        "-29°C 이상",
-        "-40°C 이상"
-      ],
-      ans: 2,
-      exp: "보잉 787 매뉴얼 상 이륙 전 주기 상태의 연료 온도는 최소 -29°C (-20°F) 이상을 나타내고 있어야 비행 가동이 보장됩니다."
-    },
-    {
-      id: "mcq-weather-9",
-      q: "동절기 디아이싱/안티아이싱 지상 대기 중, 이륙 전 택시 지연 시간이 몇 분을 초과할 때 날개 및 엔진의 수동 제빙(de-ice) 조치를 새롭게 취해야 합니까?",
-      opts: [
-        "총 지상 대기 60분 초과 시",
-        "총 지상 대기 90분 초과 시",
-        "총 지상 대기 120분 초과 시",
-        "총 지상 대기 150분 초과 시"
-      ],
-      ans: 2,
-      exp: "택시 이동 시간을 포함한 총 지상 대기 시간이 120분을 통과해 버리면 이륙 전에 엔진을 수동으로 완전 제빙해야 합니다."
-    },
-    {
-      id: "mcq-weather-10",
-      q: "OAT(지상) 또는 TAT(공중)가 몇 도 이하일 때 착이륙 시 가시 수분이 있는 조건 하에서 Icing Condition(결빙 조건)으로 인지해야 합니까?",
-      opts: [
-        "15°C 이하",
-        "10°C 이하",
-        "5°C 이하",
-        "0°C 이하"
-      ],
-      ans: 1,
-      exp: "보잉 및 국제 표준 항공 기준 상 착/이륙 중 OAT/TAT 가 10°C 이하이고 안개, 비, 슬러시 등 수분이 감지되면 결빙 조건으로 통제 선언됩니다."
-    }
-  ],
-  "nonnorm": [
-    {
-      id: "mcq-nonnorm-1",
-      q: "조종사가 비행 중 급격한 아날로그/디지털 계기 오작동을 인지하고 'AIRSPEED UNRELIABLE' 메모리 아이템(Memory Item)을 선언했습니다. 초기 항공기 통제력 확보를 위해 기어 수납(Gear up) 상태에서 즉각 고정 세팅해야 하는 플랩 상태별 피치 각도(Pitch Attitude)와 추력(Thrust) 조합으로 올바른 것은 무엇입니까?",
-      opts: [
-        "Flaps Extended 상태: 10° 및 85% N1 / Flaps Up 상태: 4° 및 70% N1",
-        "Flaps Extended 상태: 15° 및 90% N1 / Flaps Up 상태: 5° 및 75% N1",
-        "Flaps Extended 상태: 5° 및 60% N1 / Flaps Up 상태: 2° 및 Flight Idle",
-        "Flaps Extended 상태: 10° 및 80% N1 / Flaps Up 상태: 4° 및 65% N1"
-      ],
-      ans: 0,
-      exp: "속도계 신뢰 불가 비상 상황 시, 플랩 연장 상태에서는 10° 피치 및 85% N1 추력을 세팅하고, 플랩 수납(Clean) 상태에서는 4° 피치 및 70% N1 추력을 고정 인가해야 안전 여유 고도가 확보됩니다."
-    },
-    {
-      id: "mcq-nonnorm-2",
-      q: "FAA 권고 및 보잉 개정 절차에 따라, 지상(On the Ground)에서 EICAS 경보 메시지와 함께 'FIRE ENG L, R' 상황이 발생했을 때 올바른 비상 처리 요령은 무엇입니까?",
-      opts: [
-        "비행 중과 동일하게 Fuel Control Switch Cutoff 등 Memory Item을 즉시 암기 수행한다.",
-        "Memory Item을 수행하지 않고, 즉시 '[ ] FIRE ENG L, R' 전자기 체크리스트(ECL)를 직접 수행한다.",
-        "소방대가 도착할 때까지 엔진 시동을 유지하고 소화병 방출을 보류한다.",
-        "오토파일럿 디스커넥트 스위치를 연속으로 3회 누른다."
-      ],
-      ans: 1,
-      exp: "최신 지상 엔진 화재 지침에 따라, 지상에서는 즉각적인 상황 인지 하에 암기 과제(Memory Item) 없이 곧바로 '[ ] FIRE ENG L, R' 전자기 체크리스트(ECL)를 전 단계 Read & Do로 직접 수행합니다."
-    },
-    {
-      id: "mcq-nonnorm-3",
-      q: "이륙 중 지상속도 85 knots 초과 영역에서 이륙 거부(RTO)를 개시했을 때, Autobrake 시스템이 최대 제동 압력을 자동으로 인가(Apply)하기 위한 조종사의 필수 조작 조건은 무엇입니까?",
-      opts: [
-        "RTO Autobrake 다이얼 선택 여부와 무관하게 양쪽 스로틀 레버를 idle 영역으로 수동 복귀시킨다.",
-        "오토 브레이크 다이얼이 RTO 상태이고, 양쪽 Thrust lever가 수동으로 idle 범위로 복귀되어야 한다.",
-        "역추력 레버(Reverser)가 반드시 Maximum Reverse 상태로 끝까지 인가되어야 한다.",
-        "오토 브레이크 작동을 위해 페달 브레이크를 조종사가 물리적으로 직접 끝까지 밟아야 한다."
-      ],
-      ans: 1,
-      exp: "RTO 자동 제동은 오토 브레이크 선택기가 RTO 위치에 있고, 지상속도가 85노트를 초과한 상태에서 조종사가 양쪽 스로틀(Thrust Lever)을 Idle 위치로 당길 때 비로소 최대 제동이 작동됩니다."
-    },
-    {
-      id: "mcq-nonnorm-4",
-      q: "비행 중 양쪽 엔진이 모두 고장나거나 스톨 상태에 빠진 'Dual Eng Fail/Stall' 심각 비상 조우 시, 조종사가 즉각 암기 수행해야 하는 메모리 항목의 올바른 조치 순서는 무엇입니까?",
-      opts: [
-        "A/T ARM 스위치 OFF → F/D OFF → 자세 4도 고정",
-        "FUEL CONTROL 스위치 양쪽 모두 CUTOFF 후 RUN → RAT 스위치 1초간 누름 → 속도 270 knots 이상 유지",
-        "APU 시동 개시 → 오토 브레이크 RTO 세팅 → 기어 다운",
-        "화재 스위치 풀(Pull) → 연료 밸브 폐쇄 → 수동 가온 강하"
-      ],
-      ans: 1,
-      exp: "Dual Eng Fail/Stall의 메모리 아이템은 1) FUEL CONTROL 스위치 양쪽 CUTOFF 후 RUN, 2) RAM AIR TURBINE 스위치를 1초간 길게 눌러 전기/유압 비상 전원 공급, 3) 윈드밀 스타트 기류를 위해 속도를 270 knots 이상으로 유지하는 것입니다."
-    },
-    {
-      id: "mcq-nonnorm-5",
-      q: "Yellow Sealing(USED & SERVICEABLE 스티커 포함) 처리가 되어 있는 EMK(Emergency Medical Kit) 비상 의료 키트의 당사 기지 교체 탑재 기준은 무엇입니까?",
-      opts: [
-        "목적지 해외 공항에서 무조건 우선 교체한다.",
-        "모기지(김포 및 인천공항)에서는 반드시 새로운 EMK로 교체 탑재하여야 한다.",
-        "봉인이 살아있다면 정비 주기가 도달하기 전까지 계속 사용 가능하다.",
-        "의무 요원(의사)의 탑승 여부가 확인될 때만 교체를 요청한다."
-      ],
-      ans: 1,
-      exp: "Yellow Sealing 처리되었거나 사용 완료된 EMK는 항공기 정비를 통제하는 모기지인 김포 및 인천공항 기지에서 무조건 새 제품으로 교체 탑재해야 합니다."
-    },
-    {
-      id: "mcq-nonnorm-6",
-      q: "엔진 고장 발생 후 기수 상승 중 고도가 1,500 ft AGL을 통과할 때의 자동 제어 추력 한계(Thrust Limit) 변화 및 이에 따른 조종사의 비행 지침으로 올바른 것은 무엇입니까?",
-      opts: [
-        "가용 추력 한계가 CON(Maximum Continuous)으로 자동 고정되므로 조종사는 아무런 조작을 하지 않아도 된다.",
-        "엔진 고장 상태로 1,500 ft AGL 통과 시 thrust limit이 CLB(Climb)로 자동 변경되므로, 오토스로틀(A/THR)을 해제하고 수동으로 추력을 증가시키는 것이 권장된다.",
-        "thrust limit이 자동으로 TO/GA 최대 출력 상태로 지속 연장된다.",
-        "자동 조종 오토스로틀이 해제되면서 역추력 제동 압력이 자동으로 차단되므로 조종사는 수동 제동을 준비해야 한다."
-      ],
-      ans: 1,
-      exp: "엔진 고장 상태로 1,500 ft AGL 통과 시 thrust limit이 자동으로 CLB로 바뀌므로 필요한 추력을 확보하기 위해 A/THR을 끄고 수동으로 가용 추력을 밀어 올리는 것이 권장됩니다."
-    },
-    {
-      id: "mcq-nonnorm-7",
-      q: "한쪽 엔진 정지 후 엔진 불작동 크루즈/드리프트다운(ENGINE INOPERATIVE CRUISE/DRIFTDOWN - FCTM 4.12) 수행 시, FMC 및 고도 선택기 조작 순서와 비행 경로 제어 특징으로 옳은 것은 무엇입니까?",
-      opts: [
-        "MCP 고도를 맞춘 후 EO D/D 페이지를 실행하면, FMC는 VNAV PTH 모드로 전환되어 약 300 fpm의 강하율로 하강하기 시작한다.",
-        "EO D/D가 실행되면 추력 기준(Thrust reference)이 즉시 TO/GA 모드로 전환되어 급격한 하강각을 그린다.",
-        "FMC가 불능(Inoperative)인 비상 상황일 때는 항상 고도 유지 모드만 활성화되고 드리프트다운은 차단된다.",
-        "산출된 최대 고도의 150 ft 이내 고도에서 새 순항 고도가 입력되면 FMC는 500 fpm의 고속 상승을 명령한다."
-      ],
-      ans: 0,
-      exp: "엔진 불작동 드리프트다운 실행 시, MCP 고도를 맞추고 EO D/D를 실행하면 thrust reference가 CON으로 바뀌고, FMC는 VNAV PTH 모드로 자동 전환되어 약 300 fpm의 완만한 강하를 통제하기 시작합니다."
-    },
-    {
-      id: "mcq-nonnorm-8",
-      q: "공중 엔진 재시동 가능 속도 영역을 안내하는 인플라이트 스타트 엔벨로프(In-Flight Start Envelope)가 PFD/ND 상에 자줏빛(Magenta)으로 자동 표시되는 트리거 조건에 대한 설명으로 올바른 것은 무엇입니까?",
-      opts: [
-        "엔진 화재 스위치가 당겨져 있고(Fire Switch OUT) 연료 제어기가 RUN 위치에 있을 때",
-        "해당 엔진 화재 스위치가 정상 위치(IN)이고, FUEL CONTROL 스위치가 CUTOFF 상태이거나 엔진 N2 RPM이 idle 미만일 때",
-        "양쪽 엔진의 N1 회전수가 동시에 40% 이하로 급격히 감소할 때 자동으로 상시 표시됨",
-        "오토파일럿 모드가 수동 전환되어 고도가 10,000 ft 이하로 가온 강하하기 시작할 때"
-      ],
-      ans: 1,
-      exp: "인플라이트 스타트 엔벨로프는 엔진 화재 스위치가 밀려 들어간 상태(IN)이고, FUEL CONTROL이 CUTOFF이거나 N2 RPM이 idle 미만으로 떨어졌을 때 PFD 등에 자줏빛 영역으로 자동 현시됩니다."
-    },
-    {
-      id: "mcq-nonnorm-9",
-      q: "이륙 가속 중엔진 고장이 감지되었을 때, 400 ft 고도 통과 단계에서 PF 및 PM이 반드시 선언하여 지상/기내와 공유해야 하는 표준 구절은 무엇입니까?",
-      opts: [
-        "RTO 개시 또는 오토파일럿 활성화 상태 지표 전달",
-        "비정상 엔진 파손 피해 발생 여부에 따른 'damage' 또는 'no damage' 문구",
-        "비상 탈출 여부 'evacuate' 또는 'remain seated' 상태 알림",
-        "가속 진행 목표 속도 V2 값 복창"
-      ],
-      ans: 1,
-      exp: "OEI 발생 하에서 400 ft 통과 단계 시 물리적 상태 피해 확인 후 'damage' 혹은 'no damage' 상태를 소리내어 선언 및 전송해야 합니다."
-    },
-    {
-      id: "mcq-nonnorm-10",
-      q: "지상 주기 혹은 이륙 활주 전, 조종석 패널 상의 'Rudder trim' 지시 계기가 몇 단위(unit) 이상을 가리키고 있을 때 오정렬 이륙 구성 경고(TO Config Warn)가 자동으로 가동됩니까?",
-      opts: [
-        "1.0 unit 이상",
-        "2.5 unit 이상",
-        "3.0 unit 이상",
-        "4.5 unit 이상"
-      ],
-      ans: 1,
-      exp: "러더 트림 오정렬 경보는 계기 상의 trim 지시 수치가 2.5 unit 이상으로 돌아가 있을 때 즉각 트리거 작동합니다."
-    }
-  ]
-};
+    const SERVICE_KEY = '8T%2FV79pamqQ%2Bwr4pQdRlcKF6772dzCiwbyc90iX1L1aRSliNgh0ceaYF74KbTjq9aKkoNZqJgmO8ftDWbx6nng%3D%3D';
+    const JEOL_NAMES = ['입춘', '경칩', '청명', '입하', '망종', '소서', '입추', '백로', '한로', '입동', '대설', '소한'];
 
-const FLASHCARD_DATA = [
-  // ── 오리지널 중요 데이터 카드 ──
-  { id: "fc-1", cat: "nonnorm", q: "Dual Eng Fail/Stall", ans: "• FUEL CONTROL 스위치 (both): CUTOFF, then RUN\n• RAM AIR TURBINE 스위치: Push and hold for 1 second\n• 기동 기류(Windmill) 유지를 위해 속도를 270 knots 이상 유지" },
-  { id: "fc-2", cat: "nonnorm", q: "AIRSPEED UNRELIABLE", ans: "• Autopilot disconnect 스위치: Push\n• A/T ARM 스위치 (both): OFF\n• F/D 스위치 (both): OFF\n• 고정 기수 자세 및 추력 세팅:\n  - Flaps extended: 10° 및 85% N1\n  - Flaps up: 4° 및 70% N1" },
-  { id: "fc-3", cat: "nonnorm", q: "STABILIZER CUTOUT (STAB Runaway)", ans: "• STAB cutout 스위치 (both): CUTOFF\n• 기동 한계 준수를 위해 현재 속도(current airspeed)를 절대 초과하지 않도록 통제" },
-  { id: "fc-4", cat: "nonnorm", q: "CABIN ALTITUDE EXCESSIVE", ans: "• 산소 마스크 착용 및 산소 100% 공급\n• 승무원 간의 통신 수립 (Establish communications)\n• 조종석 PASS OXYGEN 스위치: Push to ON\n• 10,000 ft 또는 최저 안전고도(Grid MORA) 중 높은 쪽으로 비상 강하 개시" },
-  { id: "fc-5", cat: "nonnorm", q: "ENG SVR DAMAGE / SEPARATION", ans: "• A/T ARM 스위치: OFF\n• Thrust Lever: Retard to IDLE (or confirm & retard)\n• FUEL CONTROL 스위치: CUTOFF\n• Engine Fire Switch: PULL" },
-  { id: "fc-6", cat: "nonnorm", q: "지상 FIRE ENGINE L, R 발생 시", ans: "• 개정 절차에 따라 Memory Item(암기 조치)을 절대 지상에서 선 수행하지 않음\n• 전자기식 체크리스트(ECL)의 'Ground' 항목을 순서대로 Read & Do로 직접 기동 수행" },
-  { id: "fc-7", cat: "nonnorm", q: "TCAS Climb RA in Landing Config", ans: "• Autopilot 및 Autothrottle 연결 끊기 (Disconnect)\n• 수동으로 Throttle 완전 전진하여 가용 추력 확보\n• 'FLAPS 20' 지시 및 피치 수동 제어 (TO/GA 스위치 누르지 말 것)\n• GEAR UP 수납 조치" },
-  { id: "fc-8", cat: "nonnorm", q: "LAND AT NEAREST SUITABLE AIRPORT 강제 조건", ans: "• 비정상 체크리스트 상에 해당 문구가 직접 포함된 경우\n• 기내 화재 또는 연기(Smoke)가 통제되지 않고 지속되는 경우\n• AC 전력 공급원이 단 2개만 남은 경우 (예: 양 발전기 트립)\n• 기타 안전 운항에 중대한 위험이 초과된 모든 비상 상황" },
+    let radarChartInstance = null;
+    let currentUserSeed = 0;
+    const ANIMATION_DURATION = 2000;
 
-  // ── [신규 추가] 문서 속 괄호 ( ) 가림 평가용 플래시카드 ──
-  { id: "fc-9", cat: "lim", q: "S.2.2.2 기내표준 신호( ❓ ) : All Call 운항에서 객실 : “5, 5” / 객실에서 운항 : “*, *” 에서 괄호 안에 들어갈 운항 상태 단어는?", ans: "정답: 비상시\n\n(비상시 운항 승무원과 객실 승무원 간의 안전 교신 지표 규정입니다.)" },
-  { id: "fc-10", cat: "lim", q: "S5.5 구조 및 소방등급 [FOM 5.13.2] ( ❓ ) 에서 해당 등급 기준의 대상 항공 기종명은?", ans: "정답: B787\n\n(해당 규정의 ICAO 9등급 및 FAA E등급 지표 적용 기종입니다.)" },
-  { id: "fc-11", cat: "lim", q: "Note: ( ❓ ) 과 Outer Main Gear Wheel Span 등급이 다를 경우, 높은 등급을 적용한다. 에서 가려진 단어는?", ans: "정답: Wingspan\n\n(항공기 크기 Letter 등급 적용 시 Wingspan을 우선 보수적으로 비교 적용합니다.)" },
-  { id: "fc-12", cat: "lim", q: "B787-9 [ ❓ ] 거리 : 25.8m 에서 대괄호 안에 들어갈 기어 축 거리 기준명은?", ans: "정답: Nose Gear - Main Gear\n\n(B787-9 기종의 앞바퀴축에서 주바퀴축까지의 거리 정보입니다.)" },
-  { id: "fc-13", cat: "lim", q: "Engine Oil System : -40 °C • limit thrust to a setting normally used for taxi ( ❓ ) 에서 가려진 N1 추력 제한값은?", ans: "정답: 45% N1\n\n(극 저온 지상 시동 후 유동성 확보를 위해 택시 중 제한해야 하는 목표 추력입니다.)" },
-  { id: "fc-14", cat: "lim", q: "Tailwind( ❓ ) and Crosswind(+ 40 kts) : limit thrust 45% N1 에서 가려진 배풍 제한 상세 조건은?", ans: "정답: 35 kts + Tailwind 5 kts\n\n(Oat -40도 시 역한 기류 방지를 위한 배풍 제어 성분 치수입니다.)" },
-  { id: "fc-15", cat: "lim", q: "B787-9 테일 스트라이크 한계 피치각: 7.8° ( ❓ ) 에서 가려진 가변 최대 한계 피치각 조건은?", ans: "정답: 지상 청소각 고려 시 최대 9.7°\n\n(기체 하부 지상 클리어런스 청소 효과 반영 시의 절대 최대 피치 각도입니다.)" },
-  { id: "fc-16", cat: "weather", q: "RECOMMENDED MAX. DRY ICE LOAD( ❓ ) 에서 가려진 당사 매뉴얼 조항 코드는?", ans: "정답: refer to FOM 13.2\n\n(드라이아이스 기내 승인 한계와 탑재 금지 구역을 지시하는 규정 번호입니다.)" },
-  { id: "fc-17", cat: "weather", q: "Dry Ice Sublimation Rate 1%가 적용되는 포장 박스 무게 기준: 100 lbs( ❓ ) 에서 가려진 kg 단위 수치는?", ans: "정답: 45kg\n\n(100 lbs에 상응하는 킬로그램 단위 기준 무게입니다.)" },
-  { id: "fc-18", cat: "weather", q: "Dry Ice (Code ❓ ) 로 분류되는 보잉 위험물 특수 코드명은?", ans: "정답: PER(perishable)\n\n(드라이아이스와 Live Animal 동일실 격리를 유도하는 위험 물질 분류 표기입니다.)" },
-  { id: "fc-19", cat: "lim", q: "B787-9 180도 선회 포장 도로 폭 한계 수치: ( ❓ ) 154 ft 에서 가려진 미터법 수치는?", ans: "정답: 47.0 m\n\n(B787-9 기종의 도로 선착 반경 최소 한계 미터 수치입니다.)" },
-  { id: "fc-20", cat: "lim", q: "B787-10 180도 선회 포장 도로 폭 한계 수치: ( ❓ ) 176 ft 7 inches 에서 가려진 미터법 수치는?", ans: "정답: 53.8 m\n\n(동체 연장형 B787-10 기종의 최소 도로 선회 폭 미터 단위 기준입니다.)" },
-  { id: "fc-21", cat: "lim", q: "Turns of 180 Degrees ( ❓ ) 에서 가려진 보잉 비행교범 규정 장은?", ans: "정답: FCTM 2.10\n\n(선회 시 조종사 창문 하단 모서리를 기어 외측으로 삼는 지침이 명시된 장입니다.)" },
-  { id: "fc-22", cat: "lim", q: "Wind Limitations ( ❓ ) 에서 가려진 바람 성분 2가지 방향명은?", ans: "정답: Cross/Tail\n\n(RCR 활주로 노면 제동력 상태에 따라 제어 한계를 평가하는 바람 조건입니다.)" },
-  { id: "fc-23", cat: "lim", q: "Low Visibility HUD Takeoff ( ❓ ) 에서 가려진 풍속 단위 표기는?", ans: "정답: kts\n\n(정풍 25kts, 측풍/배풍 10kts의 HUD 시각 유도 한계 단위입니다.)" },
-  { id: "fc-24", cat: "norm", q: "In VNAV, if an AUTOPILOT mode fail nuisance trip ( ❓ ) occurs... 에서 가려진 계기 오류 상태 표시는?", ans: "정답: line through\n\n(오토파일럿 모드 결함 시 PFD 해당 지시 문자 위에 그어지는 무효 선 표시입니다.)" },
-  { id: "fc-25", cat: "norm", q: "Unwanted 'GLIDESLOPE' Advisory During Approaches On Airplanes ( ❓ ) 에서 가려진 접근 옵션 장치명은?", ans: "정답: KAL-43R1\n\n(통합 접근 항법 IAN 옵션 장착 기종의 불필요 오경보 대응용 뷸레틴 번호입니다.)" },
-  { id: "fc-26", cat: "norm", q: "LNAV PATH DEVIATION ( ❓ ) 에서 가려진 선회 각도 합산에 관한 가이드라인은?", ans: "정답: total for all connected turns\n\n(SID 절차 상 가속 제한을 방지하기 위해 연속된 모든 선회각의 합을 의미합니다.)" },
-  { id: "fc-27", cat: "norm", q: "PACK MESSAGES AFTER ENGINE START( ❓ ) 에서 가려진 보잉 정상 절차 장은?", ans: "정답: POM 9.1.17\n\n(시동 후 Y201 소프트웨어 팩 메시지 지연 및 사라짐 특성이 기록된 장입니다.)" },
-  { id: "fc-28", cat: "norm", q: "Expired data has a six-day grace period( ❓ ) 에서 가려진 한글 단어는?", ans: "정답: 유예 기간\n\n(FMS 단말기 데이터 만료 후 정비 업데이트 전까지 비행이 보장되는 법적 기간입니다.)" },
-  { id: "fc-29", cat: "norm", q: "Towing Power mode ( ❓ ) 에서 가려진 조업 시 전원 차단 상세 상태명은?", ans: "정답: not energized\n\n(Towing 모드 하에서 조종실 내 무전기 등에 전류가 차단되는 물리적 상태입니다.)" },
-  { id: "fc-30", cat: "weather", q: "Return to Land Fuel Jettison Limit Weight ( ❓ ) 에서 가려진 비상 회항 시나리오명은?", ans: "정답: Return to Land\n\n(이륙 직후 비상 회항 시 missed approach 고도 회복 상승성능 유지를 위해 설정하는 중량 한계입니다.)" },
-  { id: "fc-31", cat: "norm", q: "GPS SIGNAL INTERFERENCE PROCEDURES ( ❓ ) 에서 가려진 비정상 GPS 조우 대응 지침 장은?", ans: "정답: POM 9.1.6\n\n(인천 및 김포 주변 GPS 교란 시 수동 비정렬 및 런웨이 오차 예방 수칙 장입니다.)" },
-  { id: "fc-32", cat: "norm", q: "EDCT ( ❓ ) 에서 가려진 공식 관제 출발 지연 허가 타임 영문명은?", ans: "정답: Expect Departure Clearance Time\n\n(ATC 혼잡 시 배정되는 출발 보장 예정 시간입니다. 푸시백이 아닌 이륙 시간 기준입니다.)" },
+    const heavenlyStems = ['甲', '乙', '丙', '丁', '戊', '己', '庚', '辛', '壬', '癸'];
+    const earthlyBranches = ['子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥'];
+    const stemKorean = ['갑', '을', '병', '정', '무', '기', '경', '신', '임', '계'];
+    const branchKorean = ['자', '축', '인', '묘', '진', '사', '오', '미', '신', '유', '술', '해'];
 
-  // ── [추가 정보 활용 신규 괄호 가림 플래시카드] ──
-  { id: "fc-33", cat: "norm", q: "For FCAC ground operation during hot day conditions, selecting HIGH flow mode will prioritize ( ❓ ) ventilation, and Selecting LOW flow mode will prioritize ( ❓ ) cooling.", ans: "정답: cargo / cabin\n\n(HIGH 모드는 화물실 환기를 우선하고, LOW 모드는 객실 냉각을 우선 처리하도록 설계되어 있습니다.)" },
-  { id: "fc-34", cat: "norm", q: "Engine Start without APU: At a minimum, ( ❓ ) forward external power sources are required.", ans: "정답: two 90 kVA rated\n\n(APU 없이 전방 외부 전원만으로 시동을 걸기 위해 요구되는 최소한의 공급 전력원 수량 규정입니다.)" },
-  { id: "fc-35", cat: "nonnorm", q: "If ENG FAIL occurs above 1,500 ft AGL, the thrust limit will automatically change to ( ❓ ).", ans: "정답: CLB (Climb)\n\n(상승 출력 한계로 변경되므로, 안전 추진 마진 확보를 위해 A/THR을 끄고 수동 증가가 권장됩니다.)" },
-  { id: "fc-36", cat: "nonnorm", q: "ENGINE INOPERATIVE DRIFTDOWN: Under normal FMC operation, the VNAV PTH mode commands a ( ❓ ) descent rate.", ans: "정답: 300 fpm\n\n(FMC가 가동되는 최적 드리프트다운 경로에서의 최초 자동 하강률 한계 지시 수치입니다.)" },
-  { id: "fc-37", cat: "nonnorm", q: "In-Flight Start Envelope is displayed in ( ❓ ) color on the PFD/ND under abnormal start situations.", ans: "정답: magenta (자줏빛)\n\n(재시동 가능 영역은 조종실 주 비행 디스플레이 창에 자줏빛으로 자동 도식화됩니다.)" }
-];
-
-// ── SUBJECTIVE (SHORT ANSWER) QUIZ DATA (35 QUESTIONS) ──
-const SUBJECTIVE_QUIZ_DATA = [
-  {
-    id: "sa-1",
-    cat: "lim",
-    q: "All Call 운항 중 운항 승무원과 객실 승무원 간의 '비상 호출 기내 표준 신호'는 송수신 측에 따라 어떻게 규정되어 있습니까?",
-    ans: "운항에서 객실로 전달 시 “5, 5” 이며, 객실에서 조종실(운항)로 전달 시 “*, *” 입니다.",
-    keywords: ["5, 5", "*, *", "운항", "객실"]
-  },
-  {
-    id: "sa-2",
-    cat: "lim",
-    q: "당사 FOM 규정상 B787 항공기의 소방 구조 등급은 무엇이며, 대형 항공기 중 어떤 기종들과 동일 등급입니까?",
-    ans: "ICAO 9 등급 (FAA E 등급)에 속하며, A350, A330-300, B777, B747-400 기종과 동일 등급입니다.",
-    keywords: ["9 등급", "A350", "B777"]
-  },
-  {
-    id: "sa-3",
-    cat: "lim",
-    q: "FAA ADG (Airplane Design Group) 항공기 설계 등급에 의거, B787의 등급명과 이를 분류하는 2가지 물리적 치수 기준은 무엇입니까?",
-    ans: "FAA ADG Group V에 속하며, 윙스팬(Wingspan)과 꼬리날개 높이(Tail Height)를 기준으로 분류합니다.",
-    keywords: ["V", "Wingspan", "Tail Height", "윙스팬", "꼬리"]
-  },
-  {
-    id: "sa-4",
-    cat: "lim",
-    q: "Jeppesen 접근 차트에 'Eye to Wheel Height가 22 ft 이상인 경우 주의'하라는 노트가 있을 때 B787이 이 경고 대상에 속하는 수치적 이유와 물리적 위험성을 설명하십시오.",
-    ans: "B787의 해당 높이는 23 ft로 22 ft 제한값 이상에 속합니다. 이로 인해 정상적으로 강하하더라도 주 착륙장치(Main Gear)가 활주로 진입단(Threshold)을 아슬아슬하게 낮게 통과할 수 있습니다.",
-    keywords: ["23", "23 ft", "주 착륙장치", "진입단", "22"]
-  },
-  {
-    id: "sa-5",
-    cat: "lim",
-    q: "B787-9 및 B787-10 기종의 활주로 접지 전 테일 스트라이크를 방지하기 위한 이륙/착륙 '테일 스트라이크 피치 한계각(Tail Strike Pitch Attitude)'은 각각 몇 도입니까?",
-    ans: "B787-9 기종의 한계는 7.8° (지상 클리어런스 청소각 고려 시 9.7°) 이며, 동체가 연장된 B787-10 기종의 한계는 6.8° 입니다.",
-    keywords: ["7.8", "6.8"]
-  },
-  {
-    id: "sa-6",
-    cat: "lim",
-    q: "B787-9과 B787-10의 최대 기압 고도 운영 제한(Maximum Operating Altitude)은 각각 얼마입니까?",
-    ans: "B787-9의 기압 고도 제한은 43,100 ft 이고, B787-10 기종은 41,100 ft 입니다.",
-    keywords: ["43,100", "41,100"]
-  },
-  {
-    id: "sa-7",
-    cat: "lim",
-    q: "활주로 180도 선회(Turns of 180 Degrees)를 무리 없이 수행하기 위해 안전상 요구되는 최소 포장 도로 폭(Min pavement width)은 기종별로 각각 얼마입니까?",
-    ans: "B787-9은 154 ft (47.0 m) 이고, B787-10은 176 ft 7 inches (53.8 m) 입니다.",
-    keywords: ["47", "154", "53.8", "176"]
-  },
-  {
-    id: "sa-8",
-    cat: "lim",
-    q: "LAND 2 또는 LAND 3 자동 착륙 자격 지시가 뜨지 않은 일반 수동 어프로치 단계에서, Autopilot을 반드시 해제(Disengage)해야 하는 최저 한계 고도는 기종별로 각각 얼마입니까?",
-    ans: "B787-9은 135 ft AGL 이고, B787-10은 100 ft AGL 입니다.",
-    keywords: ["135", "100", "AGL"]
-  },
-  {
-    id: "sa-9",
-    cat: "lim",
-    q: "오토 브레이크 작동 중 RTO(Rejected Takeoff) 자동 제동압 명령이 활성화되기 위한 지상속도(Groundspeed) 하한선 수치 한계는 얼마입니까?",
-    ans: "지상속도가 반드시 85 knots를 초과(above 85 knots)한 상태여야 오토브레이크 RTO 제동이 동작합니다.",
-    keywords: ["85", "85 knots", "초과"]
-  },
-  {
-    id: "sa-10",
-    cat: "norm",
-    q: "IAN(통합 접근 항법) 옵션 오류로 VMC 비행 중 오경보에 의한 'GLIDESLOPE' 음성 경보가 지속적으로 트리거될 때 소거하기 위해 조종사가 가동해야 하는 장치의 정식 명칭은 무엇입니까?",
-    ans: "오버헤드 패널에 위치한 'BELOW G/S' 또는 'G/S INHIBIT' 스위치입니다.",
-    keywords: ["BELOW G/S", "G/S INHIBIT", "스위치"]
-  },
-  {
-    id: "sa-11",
-    cat: "norm",
-    q: "이륙 상승 중 NADP2 조건 하에서 이륙 플랩 세팅이 FLAPS 5보다 큰(greater than) 경우, 조기 추진력 제한 차단 방지를 위해 입력해야 하는 'Thrust Reduction' 고도는 몇 피트입니까?",
-    ans: "Thrust Reduction Point 고도를 1,500 ft로 상향 지정하여 입력해야 합니다.",
-    keywords: ["1,500", "1500", "ft"]
-  },
-  {
-    id: "sa-12",
-    cat: "norm",
-    q: "지상 택시 및 라인업 중 센서 가동 불일치로 인한 오경보인 'FMC RUNWAY DISAGREE' 발생을 예방하기 위해 준수하도록 권장되는 최대 가용 테스트 추력은 얼마입니까?",
-    ans: "최대 58% N1을 초과하여 추력을 공급하지 않아야 합니다.",
-    keywords: ["58% N1", "58%", "N1"]
-  },
-  {
-    id: "sa-13",
-    cat: "norm",
-    q: "지상 시동 전 에어플로우 서지 방지를 위해 기장이나 부기장이 에어컨 설정 창에 입력해야 하는 Cabin Occupants(승객 설정값) 표준 세팅값은 기종별로 각각 얼마입니까?",
-    ans: "B787-8/-9 기종은 318명, B787-10 기종은 337명으로 설정합니다.",
-    keywords: ["318", "337", "명"]
-  },
-  {
-    id: "sa-14",
-    cat: "norm",
-    q: "항공기 이송(Towing Power Mode) 모드로 기체를 견인 중일 때, 조종실 내에서 사용할 수 없도록 전원이 완벽히 차단(not energized)되는 대표적인 안전 시스템은 무엇입니까?",
-    ans: "무선 무전 통신 시스템 (Radio communication systems) 입니다.",
-    keywords: ["무선 통신", "Radio", "통신"]
-  },
-  {
-    id: "sa-15",
-    cat: "norm",
-    q: "지상 엔진 시동을 마친 후 2차 엔진 지표(Secondary indications) 창이 닫혔음에도 팩 결함 메시지(PACK L/R)가 계속 뜰 때, Fault로 판정하는 시간 기준은 어떻게 정의됩니까?",
-    ans: "두 번째 엔진이 러닝을 개시하고 정상 가온 상태에 도달한 후 1분을 초과하여 표시가 유지되는 경우입니다.",
-    keywords: ["1분", "두 번째", "초과"]
-  },
-  {
-    id: "sa-16",
-    cat: "weather",
-    q: "연료 방출(Fuel Jettison) 절차를 완료한 후에도 안전상 메인 연료 탱크(Main Tank)에 무조건 잔류 보존되도록 프로그램된 최소 잔류 연료량은 각각 얼마입니까?",
-    ans: "좌우 각 Main Tank에 최소 8,700 lbs가 잔류하게 됩니다.",
-    keywords: ["8,700", "8700", "lbs"]
-  },
-  {
-    id: "sa-17",
-    cat: "weather",
-    q: "자동 연료 밸런싱(Fuel Balance System)의 작동이 강제 차단(Inhibited) 처리되는 조건 3가지 이상을 서술하십시오.",
-    ans: "연료 주유/배유 시, 시스템 결함 발생 시, Center tank pump 가 가동 중일 때, 지상에서 엔진이 1개 이상 켜져 있을 때, 연료 제트저니 중이거나 FUEL DISAGREE 및 FUEL QTY LOW 메세지 표시 시 가동이 금지됩니다.",
-    keywords: ["refueling", "pump", "running", "jettison", "disagree", "low", "시동", "주유"]
-  },
-  {
-    id: "sa-18",
-    cat: "weather",
-    q: "3% Contingency Fuel 운항 관리 절차를 적용하기 위한 3% ERA (Enroute Alternate) 공항의 지리적 위치 선정 기준을 설명하십시오.",
-    ans: "목적지까지 총 비행 계획 거리의 25% 지점 또는 20%에 50 NM을 합산한 지점을 중심으로 삼고, 총 비행 계획 거리의 20%에 해당하는 거리를 반경으로 하는 원 영역 내에 위치해야 합니다.",
-    keywords: ["25%", "20%", "50 NM", "반경"]
-  },
-  {
-    id: "sa-19",
-    cat: "weather",
-    q: "B787-9/-10 항공기가 최적 순항 고도(Optimum Cruise Alt) 대비 8,000 ft 아래 고도에서 강하 비행 시 발생하는 Trip Fuel 소모 연료 패널티 가중 비율은 몇 %입니까?",
-    ans: "LRC 속도 비행 시 약 5%의 연료 연소 페널티(Trip fuel penalty)가 추가 소모됩니다.",
-    keywords: ["5%", "5", "페널티"]
-  },
-  {
-    id: "sa-20",
-    cat: "weather",
-    q: "지상 OAT 기온이 3°C 이하인 결빙 조우(Icing Condition) 상태에서 대기 중인 경우, 엔진 가열 제방빙을 위해 수행해야 하는 엔진 런업(Run-up) 점검 주기와 도달 목표 추력 조건은 어떻게 됩니까?",
-    ans: "매 60분 간격 이내에 최소 40% N1 이상의 추력을 인가하여 최소 5초 동안 런업 상태를 가온 유지해주어야 합니다.",
-    keywords: ["60분", "40%", "5초", "N1"]
-  },
-  {
-    id: "sa-21",
-    cat: "weather",
-    q: "지상 OAT 대기 온도가 몇 도를 초과할 때, 엔진 시동 보호를 위해 두 엔진의 동시 시동(Starting both engines at the same time) 조작이 엄격히 금지됩니까?",
-    ans: "외기 온도 OAT 40°C를 초과하는 극 고온 환경입니다.",
-    keywords: ["40°C", "40", "초과"]
-  },
-  {
-    id: "sa-22",
-    cat: "weather",
-    q: "기내 연료 가온 온도가 -17°C 이하인 상태에서 시동 전 전기 유압 펌프가 10분 이상 정지되어 작동되지 않았다면 조종사는 시동 전 어떤 조치를 취해야 합니까?",
-    ans: "내부 캐비테이션 예방 및 유체 가열을 위해 즉시 정비사(maintenance personnel)에게 통보하여 시스템 가열 절차 수행을 요청해야 합니다.",
-    keywords: ["정비사", "maintenance", "통보"]
-  },
-  {
-    id: "sa-23",
-    cat: "weather",
-    q: "이륙 중 지상 75노트 미만 조건일 때 착빙 오작동을 예방하기 위해 내부 로직에 의해 수동 가동이 자동으로 강제 차단(Inhibited)되는 시스템 2가지는 무엇입니까?",
-    ans: "자동 결빙 감지 시스템(Automatic ice detection) 및 윙 방빙 시스템(Wing anti-ice) 입니다.",
-    keywords: ["결빙 감지", "윙 방빙", "wing", "detection"]
-  },
-  {
-    id: "sa-24",
-    cat: "weather",
-    q: "결빙 조우 상태로 운항 후 착륙 하였을 때, 활주로 contamination 등에 의해 플랩/슬랫을 수납하지 않고 전개 상태를 그대로 유지하도록 강제하는 대표적 시나리오 조건 3가지를 서술하십시오.",
-    ans: "착륙 전 플랩/슬랫을 전개한 채 장시간 결빙 영역에 홀딩 비행하였거나, 기체 표면 결빙 퇴적이 강하게 의심될 때, 눈이나 얼음 슬러시가 가득 찬 오염된 활주로 및 유도로를 택시 중일 때 수납이 금지됩니다.",
-    keywords: ["holding", "contaminated", "ice", "결빙", "오염"]
-  },
-  {
-    id: "sa-25",
-    cat: "nonnorm",
-    q: "속도계 비신뢰(AIRSPEED UNRELIABLE) 발생 시, 기수 비상 제어를 위해 플랩 상태별 즉각 인가 고정해야 하는 암기 피치 각도(Pitch Attitude)와 N1 추력 세팅 조합을 수치와 함께 답하십시오.",
-    ans: "플랩 전개 상태(Flaps extended): 10° 피치 및 85% N1 / 플랩 수납 상태(Flaps up): 4° 피치 및 70% N1 입니다.",
-    keywords: ["10°", "85%", "4°", "70%", "N1"]
-  },
-  {
-    id: "sa-26",
-    cat: "nonnorm",
-    q: "계기 이륙 거부(RTO)를 판단 시 지상속도 80 knots 이전에 발생한 속도 이상과 80 knots 이후에 발생한 속도 이상 상황 하에서 HUD 및 비행 계속 여부(Go/No Go) 지침의 차이는 무엇입니까?",
-    ans: "80kts 이전에 속도 표시 상실을 인지하면 Rejected Takeoff(이륙 거부)를 개시하고, 80kts를 초과한 이후에는 이륙을 그대로 계속(continue) 진행해야 합니다.",
-    keywords: ["이전", "이륙 거부", "이후", "계속", "Reject", "Continue"]
-  },
-  {
-    id: "sa-27",
-    cat: "nonnorm",
-    q: "비행 중 복합 기체 이상으로 발생한 양 엔진 이중 실화(Dual Eng Fail/Stall) 상황 시 메모리 아이템 조치 3단계를 순서대로 답하십시오.",
-    ans: "1) FUEL CONTROL 스위치 양쪽 모두 CUTOFF 후 RUN, 2) RAM AIR TURBINE 스위치를 1초간 길게 누름, 3) 윈드밀 스타트를 위해 270 knots 이상의 속도를 세팅 및 유지하는 것입니다.",
-    keywords: ["CUTOFF", "RUN", "RAT", "270"]
-  },
-  {
-    id: "sa-28",
-    cat: "nonnorm",
-    q: "기체 복구 회항 등으로 최대착륙중량(MLW)과 최대이륙중량(MTOW) 상태에서 중량 초과 착륙(Overweight Landing) 시 타이어 및 축 파손 예방을 위한 각각의 최대 접지 강하율(Sink rate) 한계 수치는 얼마입니까?",
-    ans: "최대 착륙 중량(MLW) 이하에서는 600 fpm, 최대 이륙 중량(MTOW) 근접 상태에서는 360 fpm 이내의 강하율을 준수해야 접지 한계 손상을 방지할 수 있습니다.",
-    keywords: ["600 fpm", "360 fpm", "MLW", "MTOW"]
-  },
-  {
-    id: "sa-29",
-    cat: "nonnorm",
-    q: "비행 중 2개 이상의 독립된 시스템 결함(Multiple Malfunctions)이 누적되어 각각 다른 Non-Normal Landing Distance가 제시되었을 때, 보잉 공식 답변에 규정된 합리적 착륙 활주거리 계산 조합 원칙은 무엇입니까?",
-    ans: "정상 상태 기준 착륙거리(base)를 구한 후, 개별 고장 장치 1과 고장 장치 2가 유발하는 각각의 누적 증가분(increment)을 각각 계산하여 기준 정상 거리에 합산(apply both increments to the base)해야 합니다.",
-    keywords: ["정상", "기준", "증가분", "합산", "increment", "base"]
-  },
-  {
-    id: "sa-30",
-    cat: "nonnorm",
-    q: "FAA 권고에 맞춰 전면 개정된 지상 주기 중 엔진 화재(FIRE ENG L/R on Ground) 경보 시, 인플라이트 상황과 대조되는 가장 핵심적인 조종사의 지상 행동 지침 차이는 무엇입니까?",
-    ans: "지상에서는 비행 중과 달리 메모리 아이템(Memory Item)을 절차 상 선 기동하지 않으며, 즉시 소화병을 지체 없이 기동하기 위해 '[ ] FIRE ENG L, R' 전자기 체크리스트(ECL)를 직접 Read & Do로 즉시 수행합니다.",
-    keywords: ["메모리", "미수행", "ECL", "즉시", "Read"]
-  },
-
-  // ── [추가 정보 운용 지침 패턴 연동 주관식 5개 문항] ──
-  {
-    id: "sa-31",
-    cat: "norm",
-    q: "지상 FCAC 가동 조건 중 매우 뜨거운 고온 환경(Hot day conditions)일 때, FWD CARGO FLOW Selector의 HIGH 및 LOW 모드가 각각 어떤 우선순위(priority)로 제어되는지 서술하십시오.",
-    ans: "HIGH flow 모드는 cargo ventilation(화물실 환기)을 우선하고, LOW flow 모드는 cabin cooling(객실 냉방)을 우선합니다.",
-    keywords: ["HIGH", "cargo ventilation", "화물실", "환기", "LOW", "cabin cooling", "객실", "냉방"]
-  },
-  {
-    id: "sa-32",
-    cat: "norm",
-    q: "APU를 구동하지 않고 지상 외부 전방 전원(Forward External Power)만으로 양쪽 엔진 시동을 가능케 하기 위한 최소 전원 스펙 조건과 우측 엔진 먼저 시동 시의 전력 지원 체계를 설명하십시오.",
-    ans: "최소 90 kVA rated 전방 외부 전원 2개가 필요하며, 우측 엔진을 먼저 시동할 경우 후방 외부 전원(Aft External Power) 시스템이 도움을 줄 수 있습니다.",
-    keywords: ["90 kVA", "전방 외부 전원 2개", "우측 엔진 먼저", "후방 외부 전원", "aft", "right"]
-  },
-  {
-    id: "sa-33",
-    cat: "nonnorm",
-    q: "엔진 고장 상황 하에서 이륙 후 고도 400 ft를 통과할 때, 두 조종사가 엔진 상태의 가용 손상 여부를 외쳐야(state) 하는 공식 콜아웃 문구와 판단 기준을 답하십시오.",
-    ans: "엔진 고장 상태를 확인한 후 피해 여부에 따라 “damage” 또는 “no damage” 상태를 기장 및 부기장이 공식 통보(state)해야 합니다.",
-    keywords: ["damage", "no damage", "손상", "400 ft"]
-  },
-  {
-    id: "sa-34",
-    cat: "nonnorm",
-    q: "엔진 불작동 드리프트다운(EO D/D) 과정 중, 산출된 최고 고도의 150 ft 이내로 하강하거나 더 낮은 고도가 FMC에 입력되었을 때 FMC가 명령하는 자동 크루즈 디센트 강하율(Cruise descent rate) 수치는 얼마입니까?",
-    ans: "FMC는 약 1,250 fpm의 강하율로 하강할 수 있도록 크루즈 강하 제어를 명령합니다.",
-    keywords: ["1,250 fpm", "1250", "fpm"]
-  },
-  {
-    id: "sa-35",
-    cat: "nonnorm",
-    q: "FMC 장치 고장(FMC inoperative) 비상 상황 하에서 한쪽 엔진 불작동으로 안전한 하강(driftdown)을 수행하려 할 때, 조종사가 설정해야 하는 대체 표적 속도 기준과 매뉴얼 테이블 리퍼런스는 무엇입니까?",
-    ans: "대체 속도 정보로 난기류 관통 속도(Turbulence penetration airspeed)를 사용해야 하며, QRH의 Engine Out Long-Range Tables를 참조하여 조종해야 합니다.",
-    keywords: ["Turbulence penetration", "관통 속도", "QRH", "long-range"]
-  }
-];
-
-let solvedList = new Set();
-let currentCategory = 'all';
-let viewMode = 'mcq'; // 'mcq', 'sa', or 'fc'
-let subSolvedStatus = {}; // Subjective grading status map
-let currentRandomList = []; // 현재 랜덤 실행 상태 보존용 리스트
-const ALL_QUESTIONS_MAP = {}; // Global flat lookup map for all questions by ID
-
-// Global Questions Map Initialization
-function initializeQuestionsMap() {
-  // Populate from MCQ data
-  for (const cat in SYSTEM_QUIZ_DATA) {
-    if (cat === 'sa') continue;
-    SYSTEM_QUIZ_DATA[cat].forEach((q, index) => {
-      if (!q.id) {
-        q.id = `mcq-${cat}-${index + 1}`;
-      }
-      ALL_QUESTIONS_MAP[q.id] = q;
-    });
-  }
-  // Populate from Subjective data
-  SUBJECTIVE_QUIZ_DATA.forEach((q, index) => {
-    if (!q.id) {
-      q.id = `sa-${index + 1}`;
-    }
-    ALL_QUESTIONS_MAP[q.id] = q;
-  });
-  // Populate from Flashcard data
-  FLASHCARD_DATA.forEach((q, index) => {
-    if (!q.id) {
-      q.id = `fc-${index + 1}`;
-    }
-    ALL_QUESTIONS_MAP[q.id] = q;
-  });
-}
-
-// 폰트 크기 변경
-function changeFontSize(dir) {
-  let size = parseInt(document.getElementById('fontLabel').textContent);
-  size += dir;
-  if (size < 11) size = 11;
-  if (size > 24) size = 24;
-  document.getElementById('fontLabel').textContent = size + 'px';
-  document.documentElement.style.setProperty('--quiz-font-size', size + 'px');
-}
-
-// 카테고리 필터링 조작기
-function setCategory(cat) {
-  currentCategory = cat;
-  currentRandomList = []; // Reset random cache if user changes category
-  
-  // Update Category Tab Styling
-  document.querySelectorAll('.cat-tab').forEach(t => {
-    t.className = "cat-tab px-3 py-1.5 text-xs font-extrabold rounded-full text-slate-500 hover:bg-slate-100 whitespace-nowrap transition";
-  });
-  const activeTab = document.getElementById('cat-' + cat);
-  if (activeTab) {
-    activeTab.className = "cat-tab px-3 py-1.5 text-xs font-extrabold rounded-full text-white bg-blue-600 shadow-sm whitespace-nowrap transition";
-  }
-  render();
-}
-
-// 학습 모드 조작기
-function setMode(mode) {
-  viewMode = mode;
-  
-  // Update Mode Tab Styling
-  document.querySelectorAll('.mode-tab').forEach(t => {
-    t.className = "mode-tab px-3 py-1 text-xs font-extrabold rounded-full text-slate-500 hover:bg-slate-100 whitespace-nowrap transition";
-  });
-  const activeTab = document.getElementById('mode-' + mode);
-  if (activeTab) {
-    if (mode === 'mcq') {
-      activeTab.className = "mode-tab px-3 py-1 text-xs font-extrabold rounded-full text-white bg-blue-600 border border-blue-600 shadow-sm whitespace-nowrap transition";
-    } else if (mode === 'sa') {
-      activeTab.className = "mode-tab px-3 py-1 text-xs font-extrabold rounded-full text-white bg-sky-600 border border-sky-600 shadow-sm whitespace-nowrap transition";
-    } else if (mode === 'fc') {
-      activeTab.className = "mode-tab px-3 py-1 text-xs font-extrabold rounded-full text-white bg-emerald-600 border border-emerald-600 shadow-sm whitespace-nowrap transition";
-    }
-  }
-  render();
-}
-
-// 카테고리 탭 선택 (기존 레거시 탭 호환용)
-function selectCategory(cat) {
-  if (cat === 'sa') {
-    setCategory('all');
-    setMode('sa');
-  } else if (cat === 'fc') {
-    setCategory('all');
-    setMode('fc');
-  } else {
-    setCategory(cat);
-    setMode('mcq');
-  }
-}
-
-// 랜덤 20문제 실행기
-function startRandomQuiz() {
-  currentCategory = 'random';
-  viewMode = 'mcq';
-  currentRandomList = []; // 버튼 클릭 시 무작위 리스트 초기화
-  
-  // Reset navigation tabs
-  document.querySelectorAll('.cat-tab').forEach(t => {
-    t.className = "cat-tab px-3 py-1.5 text-xs font-extrabold rounded-full text-slate-500 hover:bg-slate-100 whitespace-nowrap transition";
-  });
-  
-  // Update mode tabs to show MCQ active using consistent styling (rounded-full, py-1)
-  document.querySelectorAll('.mode-tab').forEach(t => {
-    t.className = "mode-tab px-3 py-1 text-xs font-extrabold rounded-full text-slate-500 hover:bg-slate-100 whitespace-nowrap transition";
-  });
-  
-  const mcqTab = document.getElementById('mode-mcq');
-  if (mcqTab) {
-    mcqTab.className = "mode-tab px-3 py-1 text-xs font-extrabold rounded-full text-white bg-blue-600 border border-blue-600 shadow-sm whitespace-nowrap transition";
-  }
-  
-  renderRandom();
-}
-
-// 점수/풀이 리셋
-function resetSolves() {
-  solvedList.clear();
-  subSolvedStatus = {};
-  currentRandomList = [];
-  localStorage.removeItem('b787_quiz_solved');
-  localStorage.removeItem('b787_sub_solved_status');
-  localStorage.removeItem('b787_sub_written_answers'); // 작성 내용도 완전 청소
-  updateSolvedCount();
-  render();
-  showToast("🔄 모든 평가 기록과 서술 답안이 완벽히 청소되었습니다.");
-}
-
-function updateSolvedCount() {
-  const mcqTotal = SYSTEM_QUIZ_DATA.lim.length + SYSTEM_QUIZ_DATA.norm.length + SYSTEM_QUIZ_DATA.weather.length + SYSTEM_QUIZ_DATA.nonnorm.length;
-  const saTotal = SUBJECTIVE_QUIZ_DATA.length;
-  const fcTotal = FLASHCARD_DATA.length;
-  const total = mcqTotal + saTotal + fcTotal;
-  
-  document.getElementById('totalCount').textContent = total;
-  document.getElementById('solvedCount').textContent = solvedList.size;
-}
-
-// 풀이 상태 로컬스토리지 연동
-function markSolved(id) {
-  solvedList.add(id);
-  localStorage.setItem('b787_quiz_solved', JSON.stringify([...solvedList]));
-  updateSolvedCount();
-}
-
-// 자가채점 등급 지정기
-function gradeSubjective(id, scoreType) {
-  subSolvedStatus[id] = scoreType;
-  localStorage.setItem('b787_sub_solved_status', JSON.stringify(subSolvedStatus));
-  
-  // 상태별 뱃지 업데이트
-  const badgeContainer = document.getElementById(`grade-badge-container-${id}`);
-  let badgeHtml = '';
-  if (scoreType === 'perfect') {
-    badgeHtml = `<span class="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded-full border border-emerald-200">완벽히 암기함 🌟</span>`;
-  } else if (scoreType === 'partial') {
-    badgeHtml = `<span class="bg-amber-100 text-amber-800 text-[10px] font-bold px-2 py-0.5 rounded-full border border-amber-200">부분 기억함 👍</span>`;
-  } else {
-    badgeHtml = `<span class="bg-rose-100 text-rose-800 text-[10px] font-bold px-2 py-0.5 rounded-full border border-rose-200">복습 필요 🔁</span>`;
-  }
-  badgeContainer.innerHTML = badgeHtml;
-}
-
-// 개별 주관식 문제 다시 풀기
-function retrySubjective(id) {
-  solvedList.delete(id);
-  delete subSolvedStatus[id];
-  
-  const writtenAnswers = JSON.parse(localStorage.getItem('b787_sub_written_answers') || '{}');
-  delete writtenAnswers[id];
-  localStorage.setItem('b787_sub_written_answers', JSON.stringify(writtenAnswers));
-  
-  localStorage.setItem('b787_quiz_solved', JSON.stringify([...solvedList]));
-  localStorage.setItem('b787_sub_solved_status', JSON.stringify(subSolvedStatus));
-  
-  updateSolvedCount();
-  render();
-  showToast("↺ 해당 문항의 작성 기록과 평가 상태가 리셋되었습니다.");
-}
-
-// 파스텔 톤 토스트 팝업 알림 엔진
-function showToast(msg) {
-  const oldToast = document.getElementById('quiz-toast');
-  if (oldToast) oldToast.remove();
-
-  const toast = document.createElement('div');
-  toast.id = 'quiz-toast';
-  toast.className = 'fixed top-4 left-1/2 -translate-x-1/2 bg-sky-50 border border-sky-200 text-sky-800 text-xs font-semibold py-3 px-5 rounded-2xl shadow-md z-[9999] transition-all duration-300 transform translate-y-[-20px] opacity-0 flex items-center gap-2 max-w-[90%] text-center';
-  toast.innerHTML = `<span>💡</span> <span>${msg}</span>`;
-  
-  document.body.appendChild(toast);
-  
-  setTimeout(() => {
-    toast.classList.remove('translate-y-[-20px]', 'opacity-0');
-  }, 10);
-  
-  setTimeout(() => {
-    toast.classList.add('translate-y-[-20px]', 'opacity-0');
-    setTimeout(() => {
-      toast.remove();
-    }, 300);
-  }, 3800);
-}
-
-// 카테고리 라벨 맵
-function getCategoryLabel(cat) {
-  const labels = {
-    'all': '전체보기',
-    'lim': 'Limitation',
-    'norm': 'Normal & OMB',
-    'weather': 'Weather & Fuel',
-    'nonnorm': 'Non-Normal',
-    'random': '🎲 랜덤 엄선'
-  };
-  return labels[cat] || '전체보기';
-}
-
-// 퀴즈 렌더링 엔진
-function render() {
-  const container = document.getElementById('quizContainer');
-  container.innerHTML = '';
-
-  // 1. 카테고리 필터에 부합하는 주관식 리스트 분할 추출
-  let saQuestions = [];
-  if (currentCategory === 'all') {
-    saQuestions = SUBJECTIVE_QUIZ_DATA;
-  } else if (currentCategory === 'random') {
-    saQuestions = SUBJECTIVE_QUIZ_DATA; // 랜덤은 객관식만 수행하므로 폴백 보장
-  } else {
-    saQuestions = SUBJECTIVE_QUIZ_DATA.filter(q => q.cat === currentCategory);
-  }
-
-  // 2. 카테고리 필터에 부합하는 플래시카드 리스트 분할 추출
-  let fcQuestions = [];
-  if (currentCategory === 'all') {
-    fcQuestions = FLASHCARD_DATA;
-  } else if (currentCategory === 'random') {
-    fcQuestions = FLASHCARD_DATA;
-  } else {
-    fcQuestions = FLASHCARD_DATA.filter(q => q.cat === currentCategory);
-  }
-
-  // 상단 스키매틱 뷰의 표시 조건 제어 (전체보기 및 Limitation 카테고리의 객관식 모드일 때만 표시)
-  const visualSchematics = document.getElementById('visualSchematics');
-  if (visualSchematics) {
-    if ((currentCategory === 'all' || currentCategory === 'lim') && viewMode === 'mcq') {
-      visualSchematics.classList.remove('hidden');
-    } else {
-      visualSchematics.classList.add('hidden');
-    }
-  }
-
-  // 3. 플래시카드 렌더링
-  if (viewMode === 'fc') {
-    let html = `<div class="grid grid-cols-1 md:grid-cols-2 gap-4">`;
-    if (fcQuestions.length === 0) {
-      html += `
-        <div class="bg-white rounded-xl p-8 text-center text-slate-400 border border-slate-200 col-span-2 shadow-xs">
-          <span class="text-3xl">📂</span>
-          <p class="mt-2 text-xs font-bold">선택하신 카테고리에 플래시카드가 배정되어 있지 않습니다.</p>
-        </div>
-      `;
-    } else {
-      fcQuestions.forEach((card, idx) => {
-        const isParenthesesCard = card.q.includes('❓');
-        const cardTheme = isParenthesesCard ? 'from-amber-50 to-amber-100/30' : 'from-emerald-50 to-emerald-100/30';
-        const borderTheme = isParenthesesCard ? 'border-amber-200/60' : 'border-emerald-200/60';
-        const isSolved = solvedList.has(card.id);
-        
-        html += `
-          <div class="flip-card h-52 cursor-pointer" id="card-fc-${card.id}" onclick="flipCard('${card.id}')">
-            <div class="flip-card-inner shadow-xs rounded-2xl border ${borderTheme} bg-white transition-all duration-500 relative h-full">
-              <!-- 앞면 (질문) -->
-              <div class="flip-card-front p-4 flex flex-col justify-between rounded-2xl bg-gradient-to-br ${cardTheme} h-full">
-                <div class="flex items-center justify-between">
-                  <span class="text-[9px] font-black tracking-wider text-slate-500 uppercase">${isParenthesesCard ? 'Parentheses Fill ✏️' : 'Flashcard [Oral] 💡'}</span>
-                  <div class="flex items-center gap-1.5">
-                    ${isSolved ? '<span class="bg-emerald-100 text-emerald-800 text-[8px] font-bold px-1.5 py-0.5 rounded-md">✓ 완료</span>' : ''}
-                    <span class="text-xs text-slate-400 font-mono font-bold">#${idx + 1}</span>
-                  </div>
-                </div>
-                <div class="text-slate-800 font-extrabold text-center text-xs md:text-sm my-auto px-2 leading-relaxed overflow-y-auto no-scrollbar max-h-[110px]">${card.q}</div>
-                <div class="text-[9px] text-slate-400 text-center font-bold">탭하여 모범 정답 뒤집기 🔄</div>
-              </div>
-              <!-- 뒷면 (정답) -->
-              <div class="flip-card-back p-4 flex flex-col justify-between rounded-2xl bg-slate-900 text-white h-full">
-                <div class="flex items-center justify-between border-b border-slate-800 pb-1.5">
-                  <span class="text-[9px] font-bold text-sky-400 uppercase">Answer Sheet</span>
-                  <span class="text-xs text-slate-500 font-mono font-bold">#${idx + 1}</span>
-                </div>
-                <div class="text-xs leading-relaxed text-left my-auto text-slate-200 whitespace-pre-line font-medium overflow-y-auto no-scrollbar py-2 max-h-[120px]">${card.ans}</div>
-                <div class="text-[8px] text-sky-400/80 text-center font-extrabold">확인 완료 💡</div>
-              </div>
-            </div>
-          </div>
-        `;
-      });
-    }
-    html += `</div>`;
-    container.innerHTML = html;
-    return;
-  }
-
-  // 4. 주관식 평가 렌더링
-  if (viewMode === 'sa') {
-    let html = `
-      <div class="flex items-center justify-between border-b border-slate-200 pb-3 mb-4">
-        <h2 class="font-black text-slate-800 text-base flex items-center gap-2">
-          <span class="inline-block w-2 h-4 bg-sky-500 rounded-sm"></span>
-          ✍️ 주관식 키워드 매칭 평가 (${saQuestions.length}문항)
-        </h2>
-        <span class="text-[10px] bg-slate-100 text-slate-500 px-3 py-1 rounded-full font-bold">AI 키워드 진단</span>
-      </div>
-    `;
-
-    if (saQuestions.length === 0) {
-      html += `
-        <div class="bg-white rounded-xl p-8 text-center text-slate-400 border border-slate-200 shadow-xs">
-          <span class="text-3xl">📂</span>
-          <p class="mt-2 text-xs font-bold">선택하신 카테고리에 주관식 평가 문항이 배정되어 있지 않습니다.</p>
-        </div>
-      `;
-    } else {
-      const writtenAnswers = JSON.parse(localStorage.getItem('b787_sub_written_answers') || '{}');
-      
-      saQuestions.forEach((q, qidx) => {
-        const isSolved = solvedList.has(q.id);
-        const savedText = writtenAnswers[q.id] || '';
-        const savedGrade = subSolvedStatus[q.id];
-        
-        let statusBadge = '';
-        if (savedGrade === 'perfect') statusBadge = `<span class="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded-full border border-emerald-200">완벽히 암기함 🌟</span>`;
-        else if (savedGrade === 'partial') statusBadge = `<span class="bg-amber-100 text-amber-800 text-[10px] font-bold px-2 py-0.5 rounded-full border border-amber-200">부분 기억함 👍</span>`;
-        else if (savedGrade === 'needs_review') statusBadge = `<span class="bg-rose-100 text-rose-800 text-[10px] font-bold px-2 py-0.5 rounded-full border border-rose-200">복습 필요 🔁</span>`;
-
-        // 새로고침 시 이전에 완료했던 서술 답안의 실시간 매칭 상태를 복원 계산
-        let matchResultHtml = '';
-        if (isSolved && savedText) {
-          let matchedCount = 0;
-          let matchHtml = `<div class="mt-3 flex flex-wrap gap-2 items-center">
-            <span class="text-[10px] font-bold text-slate-500 uppercase">키워드 매치 상태:</span>`;
-          
-          const normalizedUser = savedText.toLowerCase().replace(/\s+/g, '');
-          q.keywords.forEach(kw => {
-            const normalizedKw = kw.toLowerCase().replace(/\s+/g, '');
-            const isMatched = normalizedUser.includes(normalizedKw);
-            if (isMatched) {
-              matchedCount++;
-              matchHtml += `<span class="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded-md border border-emerald-200">✓ ${kw}</span>`;
-            } else {
-              matchHtml += `<span class="bg-slate-100 text-slate-400 text-[10px] font-bold px-2 py-0.5 rounded-md border border-slate-200 line-through">✗ ${kw}</span>`;
+    const SolarManager = {
+        cache: JSON.parse(localStorage.getItem('solarTermsDB') || '{}'),
+        lunarCache: JSON.parse(localStorage.getItem('lunarToSolarDB') || '{}'),
+        // 절기별 표준 날짜 (API 실패시 대비)
+        defaultJeols: { '소한': 6, '입춘': 4, '경칩': 6, '청명': 5, '입하': 6, '망종': 6, '소서': 8, '입추': 8, '백로': 8, '한로': 9, '입동': 8, '대설': 7 },
+        async fetchYear(year) {
+            if (this.cache[year] && Object.keys(this.cache[year]).length >= 12) return this.cache[year];
+            const months = Array.from({length: 12}, (_, i) => i + 1);
+            const yearData = {};
+            await Promise.all(months.map(async (m) => {
+                try {
+                    const res = await fetch(`https://apis.data.go.kr/B090041/openapi/service/SpcdeInfoService/get24DivisionsInfo?serviceKey=${SERVICE_KEY}&solYear=${year}&solMonth=${m.toString().padStart(2, '0')}&_type=json`);
+                    const data = await res.json();
+                    const items = data.response?.body?.items?.item;
+                    const processItem = (item) => {
+                        if (item && JEOL_NAMES.includes(item.dateName)) {
+                            yearData[item.dateName] = {
+                                date: item.locdate.toString(),
+                                time: item.kst.toString().padStart(4, '0')
+                            };
+                        }
+                    };
+                    if (Array.isArray(items)) items.forEach(processItem);
+                    else if (items) processItem(items);
+                } catch (e) { console.error(`Error fetching divisions ${year}-${m}`, e); }
+            }));
+            if (Object.keys(yearData).length > 0) {
+                this.cache[year] = { ...this.cache[year], ...yearData };
+                localStorage.setItem('solarTermsDB', JSON.stringify(this.cache));
             }
-          });
-          matchHtml += `</div>`;
-          const matchRate = Math.round((matchedCount / q.keywords.length) * 100);
-          matchResultHtml = `
-            <div class="mt-2 text-xs font-black text-slate-700">
-              분석 매칭율: <span class="${matchRate >= 50 ? 'text-emerald-600' : 'text-amber-600'}">${matchRate}%</span> (${matchedCount}/${q.keywords.length}개 핵심 데이터 구체화 완료)
-            </div>
-            ${matchHtml}
-          `;
+            return yearData;
+        },
+        async convertLunarToSolar(year, month, day, isIntercalary) {
+            const key = `${year}${month.toString().padStart(2,'0')}${day.toString().padStart(2,'0')}${isIntercalary?'I':'S'}`;
+            if (this.lunarCache[key]) return this.lunarCache[key];
+
+            try {
+                const leap = isIntercalary ? '윤달' : '평달';
+                const res = await fetch(`https://apis.data.go.kr/B090041/openapi/service/LrsrCldInfoService/getLunarToSolarInfo?serviceKey=${SERVICE_KEY}&lunYear=${year}&lunMonth=${month.toString().padStart(2,'0')}&lunDay=${day.toString().padStart(2,'0')}&leapMonth=${leap}&_type=json`);
+                const data = await res.json();
+                const item = data.response?.body?.items?.item;
+                if (item) {
+                    const solar = { year: parseInt(item.solYear), month: parseInt(item.solMonth), day: parseInt(item.solDay) };
+                    this.lunarCache[key] = solar;
+                    localStorage.setItem('lunarToSolarDB', JSON.stringify(this.lunarCache));
+                    return solar;
+                }
+            } catch (e) { console.error("Lunar conversion error", e); }
+            return { year, month, day };
+        },
+        getJeolDateTime(year, jeolName) {
+            const data = this.cache[year];
+            if (data && data[jeolName]) {
+                const d = data[jeolName].date;
+                const t = data[jeolName].time;
+                return new Date(d.substring(0,4), parseInt(d.substring(4,6))-1, d.substring(6,8), t.substring(0,2), t.substring(2,4));
+            }
+            // API 데이터 부재 시 기본값 반환 (매년 비슷한 시기에 절기가 들어옴)
+            const day = this.defaultJeols[jeolName] || 5;
+            const monthMap = { '소한': 0, '입춘': 1, '경칩': 2, '청명': 3, '입하': 4, '망종': 5, '소서': 6, '입추': 7, '백로': 8, '한로': 9, '입동': 10, '대설': 11 };
+            return new Date(year, monthMap[jeolName], day, 12, 0); // 기본 낮 12시로 설정
+        }
+    };
+
+    function getUpcomingSaturday() {
+        const today = new Date();
+        const currentDay = today.getDay(); 
+        let distanceToSaturday = 6 - currentDay;
+        const targetDate = new Date(today);
+        targetDate.setDate(today.getDate() + distanceToSaturday);
+        return targetDate;
+    }
+
+    const nextSaturday = getUpcomingSaturday();
+    const nextSaturdayDateStr = `${nextSaturday.getFullYear()}년 ${String(nextSaturday.getMonth() + 1).padStart(2, '0')}월 ${String(nextSaturday.getDate()).padStart(2, '0')}일`;
+    const nextSaturdayISO = `${nextSaturday.getFullYear()}-${String(nextSaturday.getMonth() + 1).padStart(2, '0')}-${String(nextSaturday.getDate()).padStart(2, '0')}`;
+    
+    document.getElementById('headerSaturday').textContent = nextSaturdayDateStr;
+    document.querySelectorAll('.targetSaturday').forEach(el => el.textContent = nextSaturdayDateStr);
+
+    function mulberry32(a) {
+        return function() {
+          var t = a += 0x6D2B79F5; t = Math.imul(t ^ t >>> 15, t | 1);
+          t ^= t + Math.imul(t ^ t >>> 7, t | 61); return ((t ^ t >>> 14) >>> 0) / 4294967296;
+        }
+    }
+
+    function generateSeed(name, birth, time, saturdayISO) {
+        let str = name + birth + time + saturdayISO; 
+        let hash = 0;
+        for (let i = 0; i < str.length; i++) { hash = ((hash << 5) - hash) + str.charCodeAt(i); hash |= 0; }
+        return Math.abs(hash);
+    }
+
+    document.getElementById('inputBirth').addEventListener('input', function(e) {
+        let val = e.target.value.replace(/\D/g, "");
+        if (val.length > 4 && val.length <= 6) val = val.substring(0, 4) + "-" + val.substring(4);
+        else if (val.length > 6) val = val.substring(0, 4) + "-" + val.substring(4, 6) + "-" + val.substring(6, 8);
+        e.target.value = val;
+    });
+
+    document.getElementById('destinyForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const nameInput = document.getElementById('inputName').value.trim();
+        const name = nameInput || "익명";
+        const birth = document.getElementById('inputBirth').value;
+        const time = document.getElementById('inputTime').value;
+        const calType = document.querySelector('input[name="calendar"]:checked').value;
+        const longitude = parseFloat(document.getElementById('inputCity').value);
+
+        const digitsOnly = birth.replace(/\D/g, "");
+        if(digitsOnly.length < 8) { alert("생년월일 8자리를 정확히 입력해주세요."); return; }
+
+        const btn = document.getElementById('submitBtn');
+        btn.disabled = true;
+        btn.textContent = "명리학 정밀 분석 중...";
+
+        let birthYear = parseInt(digitsOnly.substring(0, 4));
+        let birthMonth = parseInt(digitsOnly.substring(4, 6));
+        let birthDay = parseInt(digitsOnly.substring(6, 8));
+
+        document.getElementById('inputPortal').style.display = 'none';
+        document.getElementById('loadingState').classList.replace('hidden', 'flex');
+        document.getElementById('loadingText').textContent = "천문연구원 데이터를 동기화하고 있습니다...";
+
+        if (calType === 'L' || calType === 'LI') {
+            const solar = await SolarManager.convertLunarToSolar(birthYear, birthMonth, birthDay, calType === 'LI');
+            birthYear = solar.year;
+            birthMonth = solar.month;
+            birthDay = solar.day;
         }
 
-        html += `
-          <div class="bg-white rounded-xl p-5 border border-slate-200 shadow-sm space-y-4 relative" id="card-${q.id}">
-            <div class="flex items-center justify-between">
-              <div class="flex items-center gap-2">
-                <span class="text-[9px] bg-sky-900 text-sky-100 px-2 py-0.5 rounded-full font-mono font-bold">SA ${qidx + 1}</span>
-                <span class="text-[9px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">${q.cat.toUpperCase()}</span>
-              </div>
-              <div id="grade-badge-container-${q.id}">${statusBadge}</div>
-            </div>
-            
-            <!-- 주관식 질문 -->
-            <h4 class="font-extrabold text-slate-800 leading-relaxed q-text">${q.q}</h4>
-            
-            <!-- 입력 텍스트 영역 -->
-            <div>
-              <textarea id="user-ans-${q.id}" rows="3" 
-                class="w-full p-3 rounded-lg border border-slate-200 focus:border-sky-500 focus:ring-1 focus:ring-sky-500 text-xs font-semibold text-slate-700 outline-none transition resize-none ${isSolved ? 'bg-slate-50 text-slate-400' : ''}"
-                placeholder="여기에 생각하신 정답 및 필수 수치/키워드를 자유롭게 작성해 보세요..." ${isSolved ? 'disabled' : ''}>${savedText}</textarea>
-            </div>
+        const currentYear = nextSaturday.getFullYear();
+        await SolarManager.fetchYear(birthYear);
+        await SolarManager.fetchYear(birthYear - 1);
+        await SolarManager.fetchYear(currentYear);
+        await SolarManager.fetchYear(currentYear - 1);
 
-            <!-- 검증 버튼 -->
-            <div class="flex justify-between items-center gap-2">
-              <button id="btn-check-${q.id}" onclick="checkSubjectiveAnswer('${q.id}')"
-                class="bg-slate-900 text-white hover:bg-slate-800 font-bold py-1.5 px-4 rounded-lg text-xs transition ${isSolved ? 'opacity-50 cursor-not-allowed' : ''}" ${isSolved ? 'disabled' : ''}>
-                🔍 정답 및 키워드 매칭 분석
-              </button>
-            </div>
-
-            <!-- 스캔된 키워드 & 모범 답안 프레임 -->
-            <div id="match-result-${q.id}" class="space-y-2">${matchResultHtml}</div>
-
-            <div id="model-ans-${q.id}" class="mt-4 p-4 rounded-xl border-l-4 bg-sky-50 border-sky-500 ${isSolved ? '' : 'hidden'} shadow-inner">
-              <div class="font-black text-[11px] uppercase tracking-wider text-sky-700 mb-1">✓ MODEL REFERENCE MATRIX</div>
-              <p class="font-semibold text-slate-800 text-xs leading-relaxed">${q.ans}</p>
-              
-              <!-- 자가 채점 선택기 -->
-              <div id="grade-panel-${q.id}" class="mt-3 pt-3 border-t border-sky-200/50 flex flex-wrap items-center gap-2">
-                <span class="text-[10px] font-bold text-slate-500">자가 진척도 기록:</span>
-                <button onclick="gradeSubjective('${q.id}', 'perfect')" class="bg-white hover:bg-emerald-50 text-emerald-700 border border-slate-200 hover:border-emerald-300 font-bold px-2 py-1 rounded text-[10px] transition">🌟 완벽히 외움</button>
-                <button onclick="gradeSubjective('${q.id}', 'partial')" class="bg-white hover:bg-amber-50 text-amber-700 border border-slate-200 hover:border-amber-300 font-bold px-2 py-1 rounded text-[10px] transition">👍 대략 기억함</button>
-                <button onclick="gradeSubjective('${q.id}', 'needs_review')" class="bg-white hover:bg-rose-50 text-rose-700 border border-slate-200 hover:border-rose-300 font-bold px-2 py-1 rounded text-[10px] transition">🔁 복습 필요</button>
-                <button onclick="retrySubjective('${q.id}')" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-2 py-1 rounded text-[10px] transition ml-auto flex items-center gap-1">↺ 다시 풀기</button>
-              </div>
-            </div>
-          </div>
-        `;
-      });
-    }
-    html += `</div>`;
-    container.innerHTML = html;
-    return;
-  }
-
-  // 5. 객관식 모드 렌더링
-  let targetQuestions = [];
-  if (currentCategory === 'all') {
-    targetQuestions = [...SYSTEM_QUIZ_DATA.lim, ...SYSTEM_QUIZ_DATA.norm, ...SYSTEM_QUIZ_DATA.weather, ...SYSTEM_QUIZ_DATA.nonnorm];
-  } else if (currentCategory === 'random') {
-    targetQuestions = currentRandomList;
-  } else {
-    targetQuestions = SYSTEM_QUIZ_DATA[currentCategory] || [];
-  }
-
-  renderQuestionList(targetQuestions, getCategoryLabel(currentCategory));
-}
-
-// 🎲 랜덤 중복 방지 기반 엄선 20제 추출 알고리즘
-function renderRandom() {
-  const container = document.getElementById('quizContainer');
-  
-  if (currentRandomList.length === 0) {
-    const allMCQs = [...SYSTEM_QUIZ_DATA.lim, ...SYSTEM_QUIZ_DATA.norm, ...SYSTEM_QUIZ_DATA.weather, ...SYSTEM_QUIZ_DATA.nonnorm];
-    
-    // 미풀이 문제 우선 추출
-    let unsolvedMCQs = allMCQs.filter(q => !solvedList.has(q.id));
-    let selected = [];
-
-    if (unsolvedMCQs.length >= 20) {
-      const shuffled = unsolvedMCQs.sort(() => 0.5 - Math.random());
-      selected = shuffled.slice(0, 20);
-    } else if (unsolvedMCQs.length > 0) {
-      selected = [...unsolvedMCQs];
-      const solvedMCQs = allMCQs.filter(q => solvedList.has(q.id));
-      const shuffledSolved = solvedMCQs.sort(() => 0.5 - Math.random());
-      const needCount = 20 - unsolvedMCQs.length;
-      
-      selected = selected.concat(shuffledSolved.slice(0, needCount));
-      selected = selected.sort(() => 0.5 - Math.random());
-    } else {
-      const shuffled = allMCQs.sort(() => 0.5 - Math.random());
-      selected = shuffled.slice(0, 20);
-    }
-
-    currentRandomList = selected;
-  }
-
-  renderQuestionList(currentRandomList, "🎲 랜덤 엄선 20제");
-}
-
-function renderQuestionList(list, subtitle) {
-  const container = document.getElementById('quizContainer');
-  let html = `
-    <div class="flex items-center justify-between border-b border-slate-200 pb-3 mb-4">
-      <h2 class="font-black text-slate-800 text-base flex items-center gap-2">
-        <span class="inline-block w-2 h-4 bg-sky-500 rounded-sm"></span>
-        ${subtitle} (${list.length}문항)
-      </h2>
-      <span class="text-[10px] bg-slate-100 text-slate-500 px-3 py-1 rounded-full font-bold">진척도 추적 적용</span>
-    </div>
-  `;
-
-  list.forEach((q, qidx) => {
-    const qId = q.id;
-    const isSolved = solvedList.has(qId);
-    
-    html += `
-      <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-xs transition hover:shadow-sm relative overflow-hidden" id="card-${qId}">
-        <div class="flex items-center gap-2 mb-3">
-          <span class="text-[9px] bg-slate-900 text-slate-100 px-2 py-0.5 rounded-full font-mono font-bold">Q${qidx + 1}</span>
-          <span class="text-[9px] bg-sky-100 text-sky-700 px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">Memo Core</span>
-          ${isSolved ? '<span class="bg-emerald-100 text-emerald-800 text-[9px] font-bold px-2 py-0.5 rounded-full">완료 ✓</span>' : ''}
-        </div>
+        currentUserSeed = generateSeed(name, digitsOnly + calType + longitude, time, nextSaturdayISO);
         
-        <!-- 문제 본문 -->
-        <h4 class="font-extrabold text-slate-800 leading-relaxed mb-4 q-text">${q.q}</h4>
-        
-        <!-- 오지선다 버튼 프레임 -->
-        <div class="space-y-2.5 ${isSolved ? 'solved' : ''}" id="opts-container-${qId}">
-          ${q.opts.map((opt, oidx) => {
-            let btnClass = 'bg-slate-50 hover:bg-slate-100 hover:border-slate-300 text-slate-700';
-            let labelClass = 'bg-slate-200 text-slate-600';
-            let iconMarkup = '';
-            let disabledAttr = '';
-
-            if (isSolved) {
-              disabledAttr = 'disabled';
-              if (oidx === q.ans) {
-                btnClass = 'bg-emerald-500 text-white border-emerald-600';
-                labelClass = 'bg-emerald-600 text-emerald-50';
-                iconMarkup = `<span class="absolute right-4 top-1/2 -translate-y-1/2 font-black text-white text-sm">✓</span>`;
-              } else {
-                btnClass = 'bg-slate-50 text-slate-700 opacity-40';
-              }
+        let start = null;
+        function animate(t) {
+            if(!start) start = t;
+            const prog = t - start;
+            const per = Math.min((prog/ANIMATION_DURATION)*100, 100);
+            document.getElementById('progressBar').style.width = per + "%";
+            if(prog < ANIMATION_DURATION) requestAnimationFrame(animate);
+            else {
+                document.getElementById('loadingState').classList.replace('flex', 'hidden');
+                buildDashboard(name, {year: birthYear, month: birthMonth, day: birthDay}, time, longitude);
             }
+        }
+        requestAnimationFrame(animate);
+    });
 
-            return `
-              <button onclick="handleAnswer('${qId}', ${oidx})" 
-                class="w-full text-left p-3.5 rounded-xl border border-slate-200 font-semibold transition flex items-start gap-3 opt-text relative ${btnClass}"
-                id="btn-${qId}-${oidx}" ${disabledAttr}>
-                <span class="inline-flex items-center justify-center w-5 h-5 rounded-full text-[10px] font-black shrink-0 mt-0.5 ${labelClass}">${String.fromCharCode(65 + oidx)}</span>
-                <span class="flex-1">${opt}</span>
-                ${iconMarkup}
-              </button>
-            `;
-          }).join('')}
-        </div>
+    function getElementOfCharacter(char) {
+        if (['甲', '乙', '寅', '卯'].includes(char)) return 'wood';
+        if (['丙', '丁', '巳', '午'].includes(char)) return 'fire';
+        if (['戊', '己', '辰', '戌', '丑', '未'].includes(char)) return 'earth';
+        if (['庚', '辛', '申', '酉'].includes(char)) return 'metal';
+        if (['壬', '癸', '亥', '子'].includes(char)) return 'water';
+        return 'earth';
+    }
+
+    function getJulianDayNumber(year, month, day) {
+        const a = Math.floor((14 - month) / 12);
+        const y = year + 4800 - a;
+        const m = month + 12 * a - 3;
+        return day + Math.floor((153 * m + 2) / 5) + 365 * y + Math.floor(y / 4) - Math.floor(y / 100) + Math.floor(y / 400) - 32045;
+    }
+
+    function getYearPillar(year, month, day, hour, min) {
+        const birthTime = new Date(year, month - 1, day, hour, min);
+        const ipchun = SolarManager.getJeolDateTime(year, '입춘');
+        let effectiveYear = year;
+        if (ipchun && birthTime < ipchun) effectiveYear = year - 1;
+        const cycle = ((effectiveYear - 4) % 60 + 60) % 60;
+        return { stemIdx: cycle % 10, branchIdx: cycle % 12 };
+    }
+
+    function getMonthPillar(year, month, day, hour, min, yearStemIdx) {
+        const birthTime = new Date(year, month - 1, day, hour, min);
+        const jeols = ['', '소한', '입춘', '경칩', '청명', '입하', '망종', '소서', '입추', '백로', '한로', '입동', '대설'];
+        let branchIdx = 0;
+
+        let jeolName = jeols[month];
+        let jeolTime = SolarManager.getJeolDateTime(year, jeolName);
+
+        if (!jeolTime || birthTime < jeolTime) {
+            branchIdx = (month - 1) % 12;
+        } else {
+            branchIdx = month % 12;
+        }
+
+        const tigerMonthStemByYearStem = [2, 4, 6, 8, 0, 2, 4, 6, 8, 0];
+        const offsetFromTiger = (branchIdx - 2 + 12) % 12;
+        return { stemIdx: (tigerMonthStemByYearStem[yearStemIdx] + offsetFromTiger) % 10, branchIdx };
+    }
+
+    function getDayPillar(year, month, day) {
+        const jdn = getJulianDayNumber(year, month, day);
+        const cycle = (jdn + 49) % 60;
+        return { stemIdx: cycle % 10, branchIdx: cycle % 12 };
+    }
+
+    function getHourPillar(dayStemIdx, timeVal) {
+        const branchIdx = timeVal === 'unknown' ? null : parseInt(timeVal);
+        if (branchIdx === null || Number.isNaN(branchIdx)) return { stemIdx: null, branchIdx: null };
+        const ratHourStemByDayStem = [0, 2, 4, 6, 8, 0, 2, 4, 6, 8];
+        return { stemIdx: (ratHourStemByDayStem[dayStemIdx] + branchIdx) % 10, branchIdx };
+    }
+
+    function makePillar(stemIdx, branchIdx) {
+        if (stemIdx === null || branchIdx === null) return { stem: '?', branch: '?', stH: '시', brH: '미상', stemIdx: null, branchIdx: null };
+        return { stem: heavenlyStems[stemIdx], branch: earthlyBranches[branchIdx], stH: stemKorean[stemIdx], brH: branchKorean[branchIdx], stemIdx, branchIdx };
+    }
+
+    const elementNames = { wood: '목(木)', fire: '화(火)', earth: '토(토)', metal: '금(金)', water: '수(水)' };
+    const elementTone = { wood: '성장, 기획력, 관계 확장', fire: '표현력, 직감, 주목받는 힘', earth: '안정감, 현실 판단, 축적', metal: '결단력, 정리력, 원칙', water: '지혜, 흐름 읽기, 유연성' };
+
+    function getTenGod(dayStemIdx, targetStemIdx) {
+        const dayEl = Math.floor(dayStemIdx / 2);
+        const targetEl = Math.floor(targetStemIdx / 2);
+        const samePolarity = dayStemIdx % 2 === targetStemIdx % 2;
+        if (dayEl === targetEl) return samePolarity ? '비견' : '겁재';
+        if ((dayEl + 1) % 5 === targetEl) return samePolarity ? '식신' : '상관';
+        if ((dayEl + 2) % 5 === targetEl) return samePolarity ? '편재' : '정재';
+        if ((targetEl + 2) % 5 === dayEl) return samePolarity ? '편관' : '정관';
+        return samePolarity ? '편인' : '정인';
+    }
+
+    function getStrongWeak(dayElement, distribution) {
+        const count = distribution[dayElement];
+        if (count >= 3) return '신강';
+        if (count <= 1) return '신약';
+        return '중화';
+    }
+
+    function buildDashboard(name, solarBirth, timeVal, longitude) {
+        const { year, month, day } = solarBirth;
+
+        const timeOffsetMinutes = (135 - longitude) * 4;
+
+        let baseHour = 12;
+        let baseMin = 0;
+        let hourBranchIdx = null;
+
+        if (timeVal !== 'unknown') {
+            const inputHour = parseInt(timeVal) * 2 + 1; // 입력 시각의 중심 (00, 02, 04...)
+            const totalMinutes = (inputHour * 60) - timeOffsetMinutes;
+            baseHour = Math.floor(totalMinutes / 60);
+            baseMin = totalMinutes % 60;
+
+            // 보정된 시각 기준 지지 인덱스 계산
+            const adjustedTotalMin = (baseHour * 60 + baseMin + 1440) % 1440;
+            if (adjustedTotalMin >= 1380 || adjustedTotalMin < 60) hourBranchIdx = 0;
+            else hourBranchIdx = Math.floor((adjustedTotalMin + 60) / 120);
+        }
+
+        document.getElementById('displayUser').textContent = name;
+        document.getElementById('saturdayDate').textContent = nextSaturdayDateStr;
         
-        <!-- 해설 패널 -->
-        <div class="mt-4 p-4 rounded-xl border-l-4 bg-emerald-50 border-emerald-500 ${isSolved ? '' : 'hidden'} text-emerald-950 text-xs shadow-inner" id="explanation-${qId}">
-          <div class="font-black text-[11px] uppercase tracking-wider text-emerald-700 mb-1">✓ SYSTEM REFERENCE MATRIX</div>
-          <p class="font-medium leading-relaxed exp-text">${q.exp}</p>
-        </div>
-      </div>
-    `;
-  });
+        const yearPillar = getYearPillar(year, month, day, baseHour, baseMin);
+        const monthPillar = getMonthPillar(year, month, day, baseHour, baseMin, yearPillar.stemIdx);
+        const dayPillar = getDayPillar(year, month, day);
 
-  container.innerHTML = html;
-}
+        const ratHourStemByDayStem = [0, 2, 4, 6, 8, 0, 2, 4, 6, 8];
+        const hourPillarData = hourBranchIdx === null ? { stemIdx: null, branchIdx: null } : { stemIdx: (ratHourStemByDayStem[dayPillar.stemIdx] + hourBranchIdx) % 10, branchIdx: hourBranchIdx };
 
-function handleAnswer(qId, selectedIdx) {
-  const container = document.getElementById(`opts-container-${qId}`);
-  if (container.classList.contains('solved')) return;
-  
-  const q = ALL_QUESTIONS_MAP[qId];
-  if (!q) return;
-  
-  const correctIdx = q.ans;
-  const selectedBtn = document.getElementById(`btn-${qId}-${selectedIdx}`);
-  const explanationPanel = document.getElementById(`explanation-${qId}`);
+        const pillars = [
+            makePillar(yearPillar.stemIdx, yearPillar.branchIdx),
+            makePillar(monthPillar.stemIdx, monthPillar.branchIdx),
+            makePillar(dayPillar.stemIdx, dayPillar.branchIdx),
+            makePillar(hourPillarData.stemIdx, hourPillarData.branchIdx)
+        ];
 
-  if (selectedIdx === correctIdx) {
-    selectedBtn.classList.remove('bg-slate-50', 'hover:bg-slate-100');
-    selectedBtn.classList.add('bg-emerald-500', 'text-white', 'border-emerald-600');
-    selectedBtn.querySelector('span').classList.add('bg-emerald-600', 'text-emerald-50');
-    selectedBtn.innerHTML += `<span class="absolute right-4 top-1/2 -translate-y-1/2 font-black text-white text-sm">✓</span>`;
-    
-    container.classList.add('solved');
-    explanationPanel.classList.remove('hidden');
-    
-    for (let i = 0; i < q.opts.length; i++) {
-      if (i !== selectedIdx) {
-        document.getElementById(`btn-${qId}-${i}`).disabled = true;
-        document.getElementById(`btn-${qId}-${i}`).classList.add('opacity-40');
-      }
+        document.getElementById('saju-year-hanja').innerHTML = `${pillars[0].stem}<br>${pillars[0].branch}`;
+        document.getElementById('saju-year-hangul').textContent = `${pillars[0].stH}${pillars[0].brH}`;
+        document.getElementById('saju-month-hanja').innerHTML = `${pillars[1].stem}<br>${pillars[1].branch}`;
+        document.getElementById('saju-month-hangul').textContent = `${pillars[1].stH}${pillars[1].brH}`;
+        document.getElementById('saju-day-hanja').innerHTML = `${pillars[2].stem}<br>${pillars[2].branch}`;
+        document.getElementById('saju-day-hangul').textContent = `${pillars[2].stH}${pillars[2].brH}`;
+        document.getElementById('saju-hour-hanja').innerHTML = `${pillars[3].stem}<br>${pillars[3].branch}`;
+        document.getElementById('saju-hour-hangul').textContent = `${pillars[3].stH}${pillars[3].brH}`;
+
+        const distribution = { wood: 0, fire: 0, earth: 0, metal: 0, water: 0 };
+        pillars.filter(p => p.stem !== '?').forEach(p => {
+            distribution[getElementOfCharacter(p.stem)]++;
+            distribution[getElementOfCharacter(p.branch)]++;
+        });
+
+        const dayElement = getElementOfCharacter(pillars[2].stem);
+        const strongestElement = Object.keys(distribution).reduce((a, b) => distribution[a] >= distribution[b] ? a : b);
+        const weakestElement = Object.keys(distribution).reduce((a, b) => distribution[a] <= distribution[b] ? a : b);
+        const strength = getStrongWeak(dayElement, distribution);
+
+        const satYear = nextSaturday.getFullYear();
+        const satMonth = nextSaturday.getMonth() + 1;
+        const satDay = nextSaturday.getDate();
+        const satYearP = getYearPillar(satYear, satMonth, satDay, 12, 0);
+        const satMonthP = getMonthPillar(satYear, satMonth, satDay, 12, 0, satYearP.stemIdx);
+        const satDayP = getDayPillar(satYear, satMonth, satDay);
+
+        const targetFlow = {
+            pillars: [makePillar(satYearP.stemIdx, satYearP.branchIdx), makePillar(satMonthP.stemIdx, satMonthP.branchIdx), makePillar(satDayP.stemIdx, satDayP.branchIdx)],
+            dayTenGod: getTenGod(dayPillar.stemIdx, satDayP.stemIdx),
+            dayElement: getElementOfCharacter(heavenlyStems[satDayP.stemIdx])
+        };
+
+        document.getElementById('dist-wood').textContent = distribution.wood;
+        document.getElementById('dist-fire').textContent = distribution.fire;
+        document.getElementById('dist-earth').textContent = distribution.earth;
+        document.getElementById('dist-metal').textContent = distribution.metal;
+        document.getElementById('dist-water').textContent = distribution.water;
+
+        const sajuChartData = [
+            Math.max(distribution.wood * 12.5 + 10, 15),
+            Math.max(distribution.fire * 12.5 + 10, 15),
+            Math.max(distribution.earth * 12.5 + 10, 15),
+            Math.max(distribution.metal * 12.5 + 10, 15),
+            Math.max(distribution.water * 12.5 + 10, 15)
+        ];
+
+        document.getElementById('dashboard').classList.remove('hidden');
+        setTimeout(() => {
+            document.getElementById('dashboard').classList.add('opacity-100');
+            drawRadarChart(sajuChartData);
+            startLottoRollingAnimation();
+            writeInsights(name, mulberry32(currentUserSeed), { pillars, distribution, dayElement, strongestElement, weakestElement, strength, targetFlow, timeUnknown: timeVal === 'unknown' });
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }, 100);
     }
-    
-    markSolved(qId);
-  } else {
-    selectedBtn.classList.remove('bg-slate-50', 'hover:bg-slate-100');
-    selectedBtn.classList.add('bg-rose-500', 'text-white', 'border-rose-600');
-    selectedBtn.querySelector('span').classList.add('bg-rose-600', 'text-rose-50');
-    selectedBtn.innerHTML += `<span class="absolute right-4 top-1/2 -translate-y-1/2 font-black text-white text-sm">✗</span>`;
-    selectedBtn.disabled = true;
-  }
-}
 
-function checkSubjectiveAnswer(id) {
-  const q = ALL_QUESTIONS_MAP[id];
-  if (!q) return;
-  const correctKeywords = q.keywords;
-
-  const userText = document.getElementById(`user-ans-${id}`).value.trim();
-  const matchResultContainer = document.getElementById(`match-result-${id}`);
-  const modelAnsContainer = document.getElementById(`model-ans-${id}`);
-  const btn = document.getElementById(`btn-check-${id}`);
-  
-  // 입력한 텍스트를 로컬스토리지에 안전 저장
-  const writtenAnswers = JSON.parse(localStorage.getItem('b787_sub_written_answers') || '{}');
-  writtenAnswers[id] = userText;
-  localStorage.setItem('b787_sub_written_answers', JSON.stringify(writtenAnswers));
-  
-  modelAnsContainer.classList.remove('hidden');
-  
-  let matchHtml = `<div class="mt-3 flex flex-wrap gap-2 items-center">
-    <span class="text-[10px] font-bold text-slate-500 uppercase">키워드 매치 상태:</span>`;
-  
-  let matchedCount = 0;
-  const normalizedUser = userText.toLowerCase().replace(/\s+/g, '');
-  correctKeywords.forEach(kw => {
-    const normalizedKw = kw.toLowerCase().replace(/\s+/g, '');
-    const isMatched = normalizedUser.includes(normalizedKw);
-    
-    if (isMatched) {
-      matchedCount++;
-      matchHtml += `<span class="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded-md border border-emerald-200">✓ ${kw}</span>`;
-    } else {
-      matchHtml += `<span class="bg-slate-100 text-slate-400 text-[10px] font-bold px-2 py-0.5 rounded-md border border-slate-200 line-through">✗ ${kw}</span>`;
+    function drawRadarChart(data) {
+        const ctx = document.getElementById('sajuRadarChart').getContext('2d');
+        if (radarChartInstance) radarChartInstance.destroy();
+        radarChartInstance = new Chart(ctx, {
+            type: 'radar',
+            data: {
+                labels: ['목(木)', '화(火)', '토(土)', '금(金)', '수(水)'],
+                datasets: [{
+                    data: data,
+                    backgroundColor: 'rgba(212, 163, 115, 0.2)',
+                    borderColor: '#D4A373',
+                    borderWidth: 2,
+                    pointBackgroundColor: '#D4A373',
+                    pointBorderColor: '#fff',
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    r: {
+                        min: 0, max: 100, ticks: { display: false },
+                        grid: { color: 'rgba(58, 48, 46, 0.08)' },
+                        angleLines: { color: 'rgba(58, 48, 46, 0.08)' },
+                        pointLabels: { color: '#3A302E', font: { size: 14, family: 'Noto Sans KR', weight: 'bold' } }
+                    }
+                },
+                plugins: { legend: { display: false } }
+            }
+        });
     }
-  });
-  matchHtml += `</div>`;
-  
-  const matchRate = Math.round((matchedCount / correctKeywords.length) * 100);
-  matchResultContainer.innerHTML = `
-    <div class="mt-2 text-xs font-black text-slate-700">
-      분석 매칭율: <span class="${matchRate >= 50 ? 'text-emerald-600' : 'text-amber-600'}">${matchRate}%</span> (${matchedCount}/${correctKeywords.length}개 핵심 데이터 구체화 완료)
-    </div>
-    ${matchHtml}
-  `;
-  
-  document.getElementById(`grade-panel-${id}`).classList.remove('hidden');
-  btn.disabled = true;
-  btn.classList.add('opacity-50', 'cursor-not-allowed');
-  
-  const textarea = document.getElementById(`user-ans-${id}`);
-  if (textarea) {
-    textarea.disabled = true;
-    textarea.classList.add('bg-slate-50', 'text-slate-400');
-  }
-  
-  markSolved(id);
-}
 
-function flipCard(cardId) {
-  const cardElement = document.getElementById(`card-fc-${cardId}`);
-  if (cardElement) {
-    cardElement.classList.toggle('flipped');
-  }
-  
-  // 카드가 뒤집히면 학습 완료 목록에 누적 등록
-  if (!solvedList.has(cardId)) {
-    markSolved(cardId);
-  }
-}
+    function writeInsights(name, rng, chart) {
+        const elNames = { wood: '목(木)', fire: '화(火)', earth: '토(土)', metal: '금(金)', water: '수(水)' };
+        const elColors = { wood: '푸른색(청색)', fire: '붉은색(적색)', earth: '노란색(황색)', metal: '흰색(백색)', water: '검은색(흑색)' };
+        const elDesc = {
+            wood: '성장과 시작의 기운이 강하여 새로운 계획을 세우거나 추진력을 발휘하기에 적합한 특성을 가지고 있습니다.',
+            fire: '열정과 확산의 에너지가 넘쳐나며 자신을 드러내고 타인과 소통하는 활동에서 큰 강점을 보입니다.',
+            earth: '안정과 포용의 기운을 바탕으로 매사에 신중하며 현실적인 판단과 균형을 잡는 능력이 탁월합니다.',
+            metal: '결단력과 원칙을 중시하는 기운이 강하여 복잡한 일을 정리하고 결실을 맺는 과정에 능숙합니다.',
+            water: '지혜와 유연한 흐름의 기운을 타고나 상황 변화에 대처하는 능력이 뛰어나며 통찰력이 깊습니다.'
+        };
 
-window.onload = function() {
-  initializeQuestionsMap(); // 퀴즈 색인 맵 초기화
-  
-  const savedSolves = localStorage.getItem('b787_quiz_solved');
-  if (savedSolves) {
-    solvedList = new Set(JSON.parse(savedSolves));
-  }
-  const savedGrades = localStorage.getItem('b787_sub_solved_status');
-  if (savedGrades) {
-    subSolvedStatus = JSON.parse(savedGrades);
-  }
-  updateSolvedCount();
-  
-  // 카테고리 '전체', 모드 '객관식' 초기화 가동
-  setCategory('all');
-  setMode('mcq');
-};
+        const tenGodDesc = {
+            '비견': '나와 대등한 기운이 들어오는 시기로, 주관이 뚜렷해지고 본인의 의지대로 일을 추진하려는 힘이 강해집니다. 주변 동료나 친구와의 유대가 강화되지만 독단적인 판단은 경계해야 합니다.',
+            '겁재': '경쟁심과 돌발적인 에너지가 함께 들어오는 때로, 예상치 못한 변화 속에서 기회를 포착하는 능력이 빛을 발합니다. 재물 관리에 신중함이 필요하나 과감한 도전이 성과로 이어질 수 있습니다.',
+            '식신': '표현력과 재능이 샘솟는 시기로, 본인의 창의적인 발상이 구체적인 결과물로 이어지는 흐름입니다. 먹을 복과 의식주가 풍족해지는 기운이므로 여유로운 마음가짐이 행운을 부릅니다.',
+            '상관': '기존의 틀을 깨는 혁신적인 기운이 강해지는 때로, 남들이 보지 못하는 새로운 틈새를 발견하는 직관력이 매우 날카로워집니다. 말과 행동에 힘이 실려 강한 영향력을 발휘하기 좋습니다.',
+            '편재': '횡재수와 큰 규모의 재물 흐름이 발생하는 시기로, 고정된 수익 외의 영역에서 예상치 못한 결실을 기대할 수 있습니다. 공간적인 이동이나 넓은 시야를 가질 때 기운이 더욱 상승합니다.',
+            '정재': '성실한 노력에 대한 정당한 보상이 따르는 안정적인 재물 흐름입니다. 꼼꼼한 분석과 관리가 행운을 지탱하는 기반이 되며, 차근차근 쌓아 올린 기운이 번호 당첨의 토대가 됩니다.',
+            '편관': '명예와 책임감이 강조되는 엄격한 기운이지만, 이를 극복했을 때 얻는 보상이 매우 큰 시기입니다. 본인을 단련하고 긴장감을 유지할 때 하늘의 뜻이 당첨 번호로 이어질 가능성이 높습니다.',
+            '정관': '질서와 원칙이 바로 서는 안정된 기운으로, 조직이나 사회적인 인정과 함께 귀인의 도움이 따르는 흐름입니다. 순리에 따르는 마음으로 정성을 다하면 행운의 문이 자연스럽게 열리게 됩니다.',
+            '편인': '신비로운 직관과 남다른 영감이 발달하는 때로, 일반적인 논리로는 설명하기 힘든 행운이 찾아오는 기점입니다. 본인의 느낌과 예감을 믿고 집중할 때 천기누설의 진가를 확인할 수 있습니다.',
+            '정인': '나를 돕는 자애로운 기운이 넘쳐나는 시기로, 문서운이나 합격운이 강하게 작용하여 안정적인 성과를 냅니다. 마음을 비우고 정성을 들이면 복권이라는 행운의 문서가 큰 기쁨으로 다가옵니다.'
+        };
+
+        // 1. 타고난 천성 및 토요일 기류
+        const totalHtml = `
+            <p><strong>${name}님</strong>은 타고난 명식에서 <strong>${elNames[chart.strongestElement]}</strong>의 에너지가 중심을 이루고 있어, ${elDesc[chart.strongestElement]}</p>
+            <p>다가오는 토요일은 명리학적으로 <strong>${chart.targetFlow.dayTenGod}</strong>의 기운이 강하게 작용하는 날입니다. 이는 ${name}님의 일간과 조화를 이루어 평소보다 직관력이 예리해지고 전체적인 기 흐름이 한곳으로 집중되는 양상을 보일 것입니다.</p>
+        `;
+        document.getElementById('insight-total').innerHTML = totalHtml;
+
+        // 2. 주말 재물운 및 구매 타이밍
+        const wealthHtml = `
+            <p>이번 주말의 재물운 흐름을 살펴보면, <strong>${chart.targetFlow.dayTenGod}</strong>운의 영향으로 재물의 이동 통로가 평소보다 넓게 열려 있습니다. 사주 원국에서 부족했던 <strong>${elNames[chart.weakestElement]}</strong>의 기운이 토요일의 일진과 상호 보완되면서 재물적 성취를 위한 최적의 파동을 형성하고 있습니다.</p>
+            <p>가장 좋은 구매 타이밍은 해가 머리 위에 머무는 낮 시간보다는, 기운이 차분히 가라앉고 음양이 교차하는 늦은 오후나 저녁 시간이 좋습니다. 특히 본인이 가장 편안함을 느끼는 장소에서 생성된 번호를 정성껏 기록할 때 당첨의 기운이 더욱 강하게 실릴 것입니다.</p>
+        `;
+        document.getElementById('insight-wealth').innerHTML = wealthHtml;
+
+        // 3. 기운을 부르는 행동 가이드
+        const healthHtml = `
+            <p>행운을 극대화하기 위해 보완이 필요한 <strong>${elNames[chart.weakestElement]}</strong>의 기운을 일상에서 채우는 것이 중요합니다. 이번 주말에는 <strong>${elColors[chart.weakestElement]}</strong> 계열의 옷차림이나 소품을 활용해 보세요. 이 색상은 ${name}님의 부족한 오행을 보충해주어 우주의 행운 전파를 수신하는 데 큰 도움을 줍니다.</p>
+            <p>또한 번호를 확인하기 전 짧은 명상을 통해 마음의 잡념을 비우고 차분한 상태를 유지하시기 바랍니다. 주변을 청결히 정리하고 긍정적인 확언을 입 밖으로 내뱉는 행위 자체가 행운의 주파수를 본인에게 맞추는 훌륭한 조율 과정이 될 것입니다.</p>
+        `;
+        document.getElementById('insight-health').innerHTML = healthHtml;
+    }
+
+    function startLottoRollingAnimation() {
+        const containers = [1,2,3,4,5].map(i => document.getElementById(`numberContainer${i}`));
+        containers.forEach(c => {
+            c.innerHTML = ''; 
+            for(let i=0; i<6; i++) {
+                const b = document.createElement('div'); 
+                b.className = 'lotto-ball rolling'; 
+                b.innerHTML = '<span>?</span>'; 
+                c.appendChild(b); 
+            }
+        });
+        setTimeout(generateFinalNumbers, 1600);
+    }
+
+    function generateFinalNumbers() {
+        const createSet = (off) => {
+            const r = mulberry32(currentUserSeed + off); 
+            const s = new Set();
+            while(s.size < 6) s.add(Math.floor(r() * 45) + 1);
+            return Array.from(s).sort((a,b)=>a-b);
+        };
+        const sets = [77, 88, 99, 111, 222].map(off => createSet(off));
+        [1, 2, 3, 4, 5].forEach((idx) => {
+            const container = document.getElementById(`numberContainer${idx}`);
+            const balls = container.querySelectorAll('.lotto-ball'); 
+            const data = sets[idx-1];
+            data.forEach((n, i) => {
+                setTimeout(() => { 
+                    balls[i].classList.remove('rolling'); 
+                    balls[i].innerHTML = `<span>${String(n).padStart(2, '0')}</span>`; 
+                }, (idx-1) * 800 + (i * 150));
+            });
+        });
+        setTimeout(() => { document.getElementById('lottoStatusText').textContent = "천기누설 흐름에 완벽히 동조된 행운수 조율이 완성되었습니다."; }, 4500);
+    }
+
+    function resetInterface() { location.reload(); }
 </script>
 </body>
 </html>
